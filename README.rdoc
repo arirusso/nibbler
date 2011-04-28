@@ -6,8 +6,16 @@ Parse MIDI Messages
 
 == Usage
 
+  require 'nibbler'
   nibbler = Nibbler.new
-  p nibbler.parse("904040")
+
+  p nibbler.parse("90")
+  nil
+
+  p nibbler.parse("40")
+  nil
+
+  p nibbler.parse("40")
   #<MIDIMessage::NoteOn:0x9a295c8 @channel=0, @data=[91, 100], @note=91, @status=[9, 0], @velocity=100>]
 
 == Requirements
