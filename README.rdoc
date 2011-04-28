@@ -6,11 +6,9 @@ Parse MIDI Messages
 
 == Usage
 
-nibbler = Nibbler.new
-
-p nibbler.parse("904040")
-
-#<MIDIMessage::NoteOn:0x81a9fe8 @data=[64, 64], @status=[9, 0]>
+  # nibbler = Nibbler.new
+  # p nibbler.parse("904040")
+  # #<MIDIMessage::NoteOn:0x9a295c8 @channel=0, @data=[91, 100], @note=91, @status=[9, 0], @velocity=100>]
 
 == Requirements
 
@@ -18,7 +16,7 @@ p nibbler.parse("904040")
 	
 == Install
 
-* gem install nibbler
+* gem install midi-nibbler (not available yet)
 
 == Author
 
