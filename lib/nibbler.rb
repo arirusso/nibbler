@@ -2,6 +2,9 @@
 
 require 'midi-message'
 
+#
+# Parse MIDI Messages
+#
 module Nibbler
   
   VERSION = "0.0.1"
@@ -9,6 +12,24 @@ module Nibbler
   class Parser
 
     include MIDIMessage
+
+    attr_reader :buffer,
+                :messages
+
+    def initialize
+      @buffer, @messages = [], []
+    end
+
+    def clear_buffer
+      @buffer.clear
+    end
+
+    def clear_messages
+      @messages.clear
+    end
+
+    def parse(*a)
+    end
   
     def parse_bytestr(string)
 
