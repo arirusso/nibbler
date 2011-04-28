@@ -7,8 +7,10 @@ Parse MIDI Messages
 == Usage
 
 nibbler = Nibbler.new
+
 p nibbler.parse("904040")
-<MIDIMessage::NoteOn 
+
+#<MIDIMessage::NoteOn:0x81a9fe8 @data=[64, 64], @status=[9, 0]>
 
 == Requirements
 
