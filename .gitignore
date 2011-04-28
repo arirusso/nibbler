@@ -1,0 +1,6 @@
+.idea
+.idea/*
+.idea/*/**
+.project
+.loadpath
+nibbler.gemspec

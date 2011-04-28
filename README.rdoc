@@ -1,0 +1,28 @@
+= nibbler
+
+== Summary
+
+Parse MIDI Messages
+
+== Usage
+
+p Nibbler.parse("904040")
+<MIDIMessage::NoteOn 
+
+== Requirements
+
+* {midi-message}[http://github.com/arirusso/midi-message]
+	
+== Install
+
+* gem install nibbler
+
+== Author
+
+* {Ari Russo}[http://github.com/arirusso] <ari.russo at gmail.com>
+
+== License
+
+Apache 2.0, See the file LICENSE
+
+Copyright (c) 2011 Ari Russo
