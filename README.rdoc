@@ -24,14 +24,7 @@ Parse MIDI Messages
   nil
 
   p nibbler.parse("40")
-  #<MIDIMessage::NoteOn:0x98c9818
-  @channel=0,
-  @data=[64, 100],
-  @name="C3",
-  @note=64,
-  @status=[9, 0],
-  @velocity=100,
-  @verbose_name="Note On: C3">
+  #<MIDIMessage::NoteOn:0x98c9818 @channel=0, @data=[64, 100], @name="C3", @note=64, @status=[9, 0], @velocity=100, @verbose_name="Note On: C3">
 
 == Author
 
