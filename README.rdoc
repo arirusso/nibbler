@@ -17,6 +17,8 @@ Parse MIDI Messages
   require 'nibbler'
   nibbler = Nibbler.new
 
+  # Enter a message piece by piece
+  
   p nibbler.parse("90")
   nil
 
@@ -25,6 +27,41 @@ Parse MIDI Messages
 
   p nibbler.parse("40")
   #<MIDIMessage::NoteOn:0x98c9818 @channel=0, @data=[64, 100], @name="C3", @note=64, @status=[9, 0], @velocity=100, @verbose_name="Note On: C3">
+  
+  # Enter a message all at once
+  
+  p nibbler.parse("904040")
+  #<MIDIMessage::NoteOn:0x98c9818 @channel=0, @data=[64, 100], @name="C3", @note=64, @status=[9, 0], @velocity=100, @verbose_name="Note On: C3">
+  
+  # use bytes
+  
+  p nibbler.parse(0x90, 0x40, 0x40)
+  #<MIDIMessage::NoteOn:0x98c9818 ...>
+  
+  # use nibbles
+  
+  p nibbler.parse(0x9, 0x0, 0x4, 0x40, 0x40)
+  #<MIDIMessage::NoteOn:0x98c9818 ...>
+  
+  # use nibbles and bytes and strings
+  
+  p nibbler.parse(0x9, "0", 0x40, "40")
+  #<MIDIMessage::NoteOn:0x98c9818 ...>
+  
+  # Look at the messages we've parsed
+  
+  p nibbler.messages
+  #<MIDIMessage::NoteOn:0x98c9818 @channel=0, @data=[64, 100], @name="C3", @note=64, @status=[9, 0], @velocity=100, @verbose_name="Note On: C3">
+  #<MIDIMessage::NoteOn:0x98c9818 @channel=0, @data=[64, 100], @name="C3", @note=64, @status=[9, 0], @velocity=100, @verbose_name="Note On: C3">
+  
+  # Add part of a message
+  
+  p nibbler.parse("90")
+  
+  # look at nibbler's buffer
+  
+  p nibbler.buffer
+  ["90"]
 
 == Author
 
