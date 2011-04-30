@@ -2,6 +2,8 @@ status (4/30/2011): not working yet
 
 = nibbler
 
+{cat on arp}[http://images.treetrouble.net/images/cat_on_arp.jpg]
+
 Parse MIDI Messages
 
 == Requirements
