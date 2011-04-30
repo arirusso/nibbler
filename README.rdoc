@@ -75,7 +75,7 @@ Add an incomplete message
   p nibbler.parse("9")
   p nibbler.parse("40")
   
-See progress in nibbler's buffer
+  # see progress
   
   p nibbler.buffer
   ["9", "40"]
