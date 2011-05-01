@@ -98,8 +98,8 @@ module Nibbler
         :remaining => nil 
       }
       first = bytes[0]
-      first_nibble = first >> 4
-      second_nibble = first >> 8
+      first_nibble = ((first & 0xF0) >> 4)
+      second_nibble = (first & 0x0F)
       output[:message], output[:processed] = *case first_nibble
         when 0x8 then only_with_bytes(3, bytes) { |b| @message_factory.note_off(second_nibble, b[1], b[2]) }
         when 0x9 then only_with_bytes(3, bytes) { |b| @message_factory.note_on(second_nibble, b[1], b[2]) }
@@ -162,7 +162,7 @@ module Nibbler
     # limit <em>byte</em> to bytes usable in MIDI ie values (0..240)
     # returns nil if the byte is outside of that range
     def sanitize_numeric(byte)
-      (0..240).include?(byte) ? byte : nil
+      (0x00..0xFF).include?(byte) ? byte : nil
     end
   
   end
