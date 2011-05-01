@@ -9,12 +9,12 @@ module Nibbler
 
     attr_reader :buffer,
                 :messages,
-                :processed_buffer,
-                :rejected_bytes
+                :processed,
+                :rejected
                 
     def_delegator :clear_buffer, :buffer, :clear
-    def_delegator :clear_processed_buffer, :processed_buffer, :clear
-    def_delegator :clear_rejected_bytes, :rejected_bytes, :clear
+    def_delegator :clear_processed, :processed, :clear
+    def_delegator :clear_rejected, :rejected, :clear
     def_delegator :clear_messages, :messages, :clear
 
     def initialize(options = {})
@@ -28,7 +28,7 @@ module Nibbler
           require 'nibbler/midi-message_factory'
           @message_factory = MIDIMessageFactory.new
       end 
-      @buffer, @processed_buffer, @rejected_bytes, @messages = [], [], [], []
+      @buffer, @processed, @rejected, @messages = [], [], [], []
     end
     
     def all_messages
@@ -36,7 +36,7 @@ module Nibbler
     end
     
     def buffer_hex
-      @buffer.map { |d| d.to_s(16) }
+      @buffer.values.map { |b| s = b.to_s(16); s.length.eql?(1) ? "0#{s}" : s }.join.upcase
     end
 
     def clear_buffer
@@ -48,121 +48,142 @@ module Nibbler
     end
 
     def parse(*a)
-      @buffer += to_bytes(a)
-      parse_buffer
+      @buffer += to_nibbles(a)
+      process_buffer
     end
   
-    def parse_buffer
-      parsed = parse_bytes(*@buffer)
-      @messages += parsed[:messages]
-      @processed_buffer += parsed[:processed_bytes]
-      @rejected_bytes = parsed[:rejected_bytes]
-      @buffer = parsed[:remaining_bytes]
-      # output
+    def process_buffer
+      output = { 
+        :messages => [], 
+        :processed => [], 
+        :remaining => @buffer,
+        :rejected => [] 
+      }    
+      i = 0  
+      while i <= (output[:remaining].length - 1)
+        # iterate through nibbles until a status message is found        
+        # see if there really is a message there
+        processed = nibbles_to_message(output[:remaining])     
+        unless processed[:message].nil?
+          # if it's a real message, reject previous nibbles
+          output[:rejected] += output[:remaining].slice(0, i + 1)
+          # and record it          
+          output[:remaining] = processed[:remaining]
+          output[:messages] << processed[:message]
+          output[:processed] = processed[:processed]
+        end
+        i += 1  
+      end
+      @messages += output[:messages]
+      @processed += output[:processed]
+      @rejected = output[:rejected]
+      @buffer = output[:remaining]
+      # return type
       # 0 messages: nil
       # 1 message: the message
       # >1 message: an array of messages
       # might make sense to make this an array no matter what...
-      parsed[:messages].length < 2 ? (parsed[:messages].empty? ? nil : parsed[:messages][0]) : parsed[:messages]
-    end
-  
-    def parse_bytes(*bytes)
-      output = { 
-        :messages => [], 
-        :processed_bytes => [], 
-        :remaining_bytes => bytes,
-        :rejected_bytes => [] 
-      }    
-      i = 0  
-      while i <= (output[:remaining_bytes].length - 1)
-        # iterate through bytes until a status message is found        
-        # see if there really is a message there
-        processed = bytes_to_message(output[:remaining_bytes])     
-        unless processed[:message].nil?
-          # if it's a real message, reject previous bytes
-          output[:rejected_bytes] += output[:remaining_bytes].slice(0, i + 1)
-          # and record it          
-          output[:remaining_bytes] = processed[:remaining]
-          output[:messages] << processed[:message]
-          output[:processed_bytes] = processed[:processed]
-        end
-        i += 1  
-      end
-      output
+      output[:messages].length < 2 ? (output[:messages].empty? ? nil : output[:messages][0]) : output[:messages]
     end
     
-    def bytes_to_message(bytes)
+    def nibbles_to_message(nibbles)
       output = { 
         :message => nil, 
         :processed => [], 
         :remaining => nil 
       }
-      first = bytes[0]
-      first_nibble = ((first & 0xF0) >> 4)
-      second_nibble = (first & 0x0F)
-      output[:message], output[:processed] = *case first_nibble
-        when 0x8 then only_with_bytes(3, bytes) { |b| @message_factory.note_off(second_nibble, b[1], b[2]) }
-        when 0x9 then only_with_bytes(3, bytes) { |b| @message_factory.note_on(second_nibble, b[1], b[2]) }
-        when 0xA then only_with_bytes(3, bytes) { |b| @message_factory.polyphonic_aftertouch(second_nibble, b[1], b[2]) }
-        when 0xB then only_with_bytes(3, bytes) { |b| @message_factory.control_change(second_nibble, b[1], b[2]) }
-        when 0xC then only_with_bytes(2, bytes) { |b| @message_factory.program_change(second_nibble, b[1]) }
-        when 0xD then only_with_bytes(2, bytes) { |b| @message_factory.channel_aftertouch(second_nibble, b[1]) }
-        when 0xE then only_with_bytes(3, bytes) { |b| @message_factory.pitch_bend(second_nibble, b[1], b[2]) }
-        when 0xF then case second_nibble
-          when 0x0 then only_with_sysex_bytes(bytes) { |b| @message_factory.system_exclusive(*b) }
-          when 0x1..0x6 then only_with_bytes(3, bytes) { |b| @message_factory.system_common(second_nibble, b[1], b[2]) }
-          when 0x8..0xF then @message_factory.system_realtime(second_nibble)
+      first = nibbles[0]
+      second = nibbles[1]
+      output[:message], output[:processed] = *case first
+        when 0x8 then only_with_bytes(3, nibbles) { |b| @message_factory.note_off(second, b[1], b[2]) }
+        when 0x9 then only_with_bytes(3, nibbles) { |b| @message_factory.note_on(second, b[1], b[2]) }
+        when 0xA then only_with_bytes(3, nibbles) { |b| @message_factory.polyphonic_aftertouch(second, b[1], b[2]) }
+        when 0xB then only_with_bytes(3, nibbles) { |b| @message_factory.control_change(second, b[1], b[2]) }
+        when 0xC then only_with_bytes(2, nibbles) { |b| @message_factory.program_change(second, b[1]) }
+        when 0xD then only_with_bytes(2, nibbles) { |b| @message_factory.channel_aftertouch(second, b[1]) }
+        when 0xE then only_with_bytes(3, nibbles) { |b| @message_factory.pitch_bend(second, b[1], b[2]) }
+        when 0xF then case second
+          when 0x0 then only_with_sysex_bytes(nibbles) { |b| @message_factory.system_exclusive(*b) }
+          when 0x1..0x6 then only_with_bytes(3, nibbles) { |b| @message_factory.system_common(second, b[1], b[2]) }
+          when 0x8..0xF then only_with_bytes(1, nibbles) { |b| @message_factory.system_realtime(second) }
         end
       end
-      output[:remaining] = bytes
+      output[:remaining] = nibbles
       output
     end
     
     private
     
-    def only_with_bytes(num, bytes, &block)              
-      if bytes.slice(0, num).length >= num
-        msg = bytes.slice!(0, num)
-        [block.call(msg), msg]
-      end  
+    def only_with_bytes(num, nibbles, &block)
+      processed = []
+      msg = nil 
+      num_nibs = num * 2              
+      # do we have enough nibbles for num bytes?
+      if nibbles.slice(0, num_nibs).length >= num_nibs
+        # if so shift those nubbles off of the array and call block with them
+        processed += nibbles.slice!(0, num_nibs)
+        # send the nibbles to the block as bytes         
+        # return the evaluated block and the remaining nibbles        
+        bytes = nibbles_to_bytes(processed)
+        msg = block.call(bytes)
+      end
+      [msg, processed]
     end
     
-    def only_with_sysex_bytes(bytes, &block)
-      ind = bytes.index(0xF7)      
+    def nibbles_to_bytes(nibbles)     
+      nibbles = nibbles.dup
+      # get rid of last nibble if there's an odd number
+      # it will be processed later anyway
+      nibbles.slice!(nibbles.length-2, 1) if nibbles.length.odd?
+      bytes = []
+      while !(nibs = nibbles.slice!(0,2)).empty?
+        byte = (nibs[0] << 4) + nibs[1]
+        bytes << byte
+      end
+      bytes
+    end
+    
+    def only_with_sysex_bytes(nibbles, &block)
+      bytes = nibbles_to_bytes(nibbles)
+      ind = bytes.index(0xF7)
+      processed = []
+      msg = nil      
       unless ind.nil?
         msg = block.call(bytes.slice!(0, ind + 1))
-        [msg, bytes]
-      end 
+        processed += nibbles.slice!(0, (ind + 1) * 2)
+      end
+      [msg, processed]
     end
     
-    # returns an array of bytes
-    def to_bytes(*a)
+    # returns an array of nibbles
+    def to_nibbles(*a)
       a.flatten!
       buf = []
       a.each do |thing|
-        case thing
-          when Array then buf += thing.map { |arr| to_bytes(arr) }.inject { |a,b| a + b }
-          when String then buf += bytestr_to_bytes(thing)
-          when Numeric then buf << sanitize_numeric(thing)
+        buf += case thing
+          when Array then thing.map { |arr| to_nibbles(*arr) }.inject { |a,b| a + b }
+          when String then hexstr_to_nibbles(thing)
+          when Numeric then byte_to_nibbles(filter_numeric(thing))
         end
       end
       buf.compact 
     end
     
     # converts a string of hex digits to bytes
-    def bytestr_to_bytes(str)
-      return [str.hex] if str.length.eql?(1)
-      output = []
-      until (bytestr = str.slice!(0,2)).eql?("")
-        output << sanitize_numeric(bytestr.hex)
-      end
-      output       
+    def hexstr_to_nibbles(str)
+      o = []
+      str.each_char { |c| o << c.hex }
+      o      
     end
     
-    # limit <em>byte</em> to bytes usable in MIDI ie values (0..240)
+    # limit <em>num</em> to bytes usable in MIDI ie values (0..240)
     # returns nil if the byte is outside of that range
-    def sanitize_numeric(byte)
-      (0x00..0xFF).include?(byte) ? byte : nil
+    def filter_numeric(num)
+      (0x00..0xFF).include?(num) ? num : nil
+    end
+    
+    def byte_to_nibbles(num)
+      [((num & 0xF0) >> 4), (num & 0x0F)]      
     end
   
   end

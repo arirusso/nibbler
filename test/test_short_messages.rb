@@ -83,5 +83,9 @@ class ShortMessageTest < Test::Unit::TestCase
     assert_equal(MIDIMessage::SystemRealtime, msg.class)
     assert_equal(8, msg.id)
   end        
+  
+  def test_multiple
+    
+  end
    
 end

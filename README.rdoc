@@ -56,14 +56,14 @@ Use bytes
   p nibbler.parse(0x90, 0x40, 0x40)
   #<MIDIMessage::NoteOn:0x98c9818 ...>
     
-Use nibbles
+You can use nibbles in string format.  Note that Nibbler (and Ruby) will consider 0x9 to be 0x09
   
-  p nibbler.parse(0x9, 0x0, 0x4, 0x40, 0x40)
+  p nibbler.parse("9", "0", "4", "4", "0", "0")
   #<MIDIMessage::NoteOn:0x98c9818 ...>
   
 Use nibbles and bytes and strings
   
-  p nibbler.parse(0x9, "0", 0x40, "40")
+  p nibbler.parse("9", "0", 0x40, 64)
   #<MIDIMessage::NoteOn:0x98c9818 ...>
   
 Look at the messages we've parsed
@@ -80,16 +80,16 @@ Add an incomplete message
 See progress
   
   p nibbler.buffer
-  [9, 64]
+  [9, 4, 0]
   
   p nibbler.buffer_hex
-  ["9", "40"]
+  "940"
   
 Nibbler defaults to use {midi-message}[http://github.com/arirusso/midi-message] but it is also possible to generate {midilib}[https://github.com/jimm/midilib] message/event objects 
 
   Nibbler.new(:message_lib => :midilib)
   
-  p nibbler.parse(0x9, "0", 0x40, "40")
+  p nibbler.parse("9", "0", 0x40, "40")
   #<Midilib::Event ...>
 
 == Author
