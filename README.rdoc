@@ -9,6 +9,8 @@ Parse MIDI Messages
 == Requirements
 
 * {midi-message}[http://github.com/arirusso/midi-message]
+
+(or optionally {midilib}[http://github.com/jimm/midilib])  
 	
 == Install
 
