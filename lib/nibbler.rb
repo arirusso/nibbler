@@ -5,6 +5,7 @@
 # 
 
 require 'midi-message'
+require 'forwardable'
 
 #
 # Parse MIDI Messages
@@ -16,12 +17,28 @@ module Nibbler
   class Parser
 
     include MIDIMessage
+    extend Forwardable
 
     attr_reader :buffer,
-                :messages
+                :fragmented_messages,
+                :messages,
+                :processed_buffer
+                
+    def_delegator :clear_buffer, :buffer, :clear
+    def_delegator :clear_processed_buffer, :processed_buffer, :clear
+    def_delegator :clear_fragmented_messages, :fragmented_messages, :clear
+    def_delegator :clear_messages, :messages, :clear
 
     def initialize
-      @buffer, @messages = [], []
+      @buffer, @processed_buffer, @fragmented_messages, @messages = [], [], [], []
+    end
+    
+    def all_messages
+      @messages | @fragmented_messages
+    end
+    
+    def buffer_hex
+      @buffer.map { |d| d.to_s(16) }
     end
 
     def clear_buffer
@@ -35,37 +52,7 @@ module Nibbler
     def parse(*a)
     end
   
-    def parse_bytestr(string)
-
-        objects = []
-        hex_digits = events.first[:data]
-        until hex_digits.nil? || hex_digits.eql?('') || hex_digits.eql?('00') || hex_digits.eql?(0)
-          status = hex_digits[0,2]
-          msg_class = case status[0].hex
-            when 0x8 then NoteOff
-            when 0x9 then NoteOn
-            when 0xA then PolyphonicAftertouch
-            when 0xB then ControlChange
-            when 0xC then ProgramChange
-            when 0xD then ChannelAftertouch
-            when 0xE then PitchBend
-            when 0xF then case status[1].hex
-              when 0x0 then SystemExclusive
-              when 0x1..0x6 then SystemCommon
-              when 0x8..0xF then SystemRealtime
-            end
-          end
-          if msg_class.nil?
-          hex_digits.slice!(0,2)
-        else
-          result = msg_class.create_from_bytestr(hex_digits)
-          unless result.nil?
-            hex_digits = result[:remaining_hex_digits]
-            objects << result[:object]
-          end
-        end
-      end
-      objects
+    def parse_buffer
     end
   
     def parse_bytes(*bytes)

@@ -77,9 +77,12 @@ Add an incomplete message
   p nibbler.parse("9")
   p nibbler.parse("40")
   
-  # see progress
+See progress
   
   p nibbler.buffer
+  [9, 64]
+  
+  p nibbler.buffer_hex
   ["9", "40"]
 
 == Author
