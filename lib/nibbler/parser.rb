@@ -60,7 +60,11 @@ module Nibbler
       @processed_buffer += parsed[:processed_bytes]
       @rejected_bytes = parsed[:rejected_bytes]
       @buffer = parsed[:remaining_bytes]
-      parsed[:messages]
+      # output
+      # 0 messages: nil
+      # 1 message: the message
+      # >1 message: an array of messages
+      parsed[:messages].length < 2 ? (parsed[:messages].empty? ? nil : parsed[:messages][0]) : parsed[:messages]
     end
   
     def parse_bytes(*bytes)

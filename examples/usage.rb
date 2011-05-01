@@ -11,12 +11,12 @@ require 'pp'
 
 nibbler = Nibbler.new
 
-pp nibbler.parse(0x90, 0x40)
+  p nibbler.parse("90")
+  nil
 
-pp nibbler.buffer
+  p nibbler.parse("40")
+  nil
 
-pp nibbler.clear_buffer
+  p nibbler.parse("40")
 
-pp nibbler.parse(0x90, 0x40, 0x40)
 
-pp nibbler.buffer
