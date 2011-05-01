@@ -12,7 +12,7 @@ status (4/30/2011): somewhat working
 	
 == Install
 
-  gem install midi-nibbler (*not available yet)
+  gem install midi-nibbler (not up yet)
 
 == Usage
 
