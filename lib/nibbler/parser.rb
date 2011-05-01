@@ -98,16 +98,16 @@ module Nibbler
       first_nibble = first >> 4
       second_nibble = first >> 8
       output[:message], output[:processed] = *case first_nibble
-        when 0x8 then with_bytes(3, bytes) { |b| @message_factory.note_off(second_nibble, b[0], b[1]) }
-        when 0x9 then with_bytes(3, bytes) { |b| @message_factory.note_on(second_nibble, b[0], b[1]) }
-        when 0xA then with_bytes(3, bytes) { |b| @message_factory.polyphonic_aftertouch(second_nibble, b[0], b[1]) }
-        when 0xB then with_bytes(3, bytes) { |b| @message_factory.control_change(second_nibble, b[0], b[1]) }
-        when 0xC then with_bytes(2, bytes) { |b| @message_factory.program_change(second_nibble, b[0]) }
-        when 0xD then with_bytes(2, bytes) { |b| @message_factory.channel_aftertouch(second_nibble, b[0]) }
-        when 0xE then with_bytes(3, bytes) { |b| @message_factory.pitch_bend(second_nibble, b[0], b[1]) }
+        when 0x8 then only_with_bytes(3, bytes) { |b| @message_factory.note_off(second_nibble, b[1], b[2]) }
+        when 0x9 then only_with_bytes(3, bytes) { |b| @message_factory.note_on(second_nibble, b[1], b[2]) }
+        when 0xA then only_with_bytes(3, bytes) { |b| @message_factory.polyphonic_aftertouch(second_nibble, b[1], b[2]) }
+        when 0xB then only_with_bytes(3, bytes) { |b| @message_factory.control_change(second_nibble, b[1], b[2]) }
+        when 0xC then only_with_bytes(2, bytes) { |b| @message_factory.program_change(second_nibble, b[1]) }
+        when 0xD then only_with_bytes(2, bytes) { |b| @message_factory.channel_aftertouch(second_nibble, b[1]) }
+        when 0xE then only_with_bytes(3, bytes) { |b| @message_factory.pitch_bend(second_nibble, b[1], b[2]) }
         when 0xF then case second_nibble
-          when 0x0 then with_sysex_bytes(bytes) { |b| @message_factory.system_exclusive(*b) }
-          when 0x1..0x6 then with_bytes(3, bytes) { |b| @message_factory.system_common(second_nibble, b[0], b[1]) }
+          when 0x0 then only_with_sysex_bytes(bytes) { |b| @message_factory.system_exclusive(*b) }
+          when 0x1..0x6 then only_with_bytes(3, bytes) { |b| @message_factory.system_common(second_nibble, b[1], b[2]) }
           when 0x8..0xF then @message_factory.system_realtime(second_nibble)
         end
       end
@@ -117,14 +117,14 @@ module Nibbler
     
     private
     
-    def with_bytes(num, bytes, &block)              
+    def only_with_bytes(num, bytes, &block)              
       if bytes.slice(0, num).length >= num
         msg = bytes.slice!(0, num)
-        [block.call(msg.slice(1, num-1)), msg]
+        [block.call(msg), msg]
       end  
     end
     
-    def with_sysex_bytes(bytes, &block)
+    def only_with_sysex_bytes(bytes, &block)
       ind = bytes.index(0xF7)      
       unless ind.nil?
         msg = block.call(bytes.slice!(0, ind + 1))
