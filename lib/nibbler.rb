@@ -50,12 +50,43 @@ module Nibbler
     end
 
     def parse(*a)
+      @buffer += to_bytes(a)
+      parse_buffer
     end
   
     def parse_buffer
+      
     end
   
     def parse_bytes(*bytes)
+    end
+    
+    private
+    
+    # this will return an array of bytes
+    def to_bytes(*a)
+      buf = []
+      a.each do |thing|
+        case thing
+          when Array then buf += thing.map { |arr| to_bytes(arr) }.inject { |a,b| a + b }
+          when String then buf += bytestr_to_bytes(thing)
+          when Numeric then buf << sanitize_numeric(thing)
+        end
+      end
+      buf.compact 
+    end
+    
+    def bytestr_to_bytes(str)
+      return [str.hex] if str.length.eql?(1)
+      output = []
+      until (bytestr = str.slice!(0,2)).eql?("")
+        output << sanitize_numeric(bytestr.hex)
+      end
+      output       
+    end
+    
+    def sanitize_numeric(byte)
+      (0..240).include?(byte) ? byte : nil
     end
   
   end
