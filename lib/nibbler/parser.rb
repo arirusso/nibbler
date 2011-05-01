@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
 #
-# (c)2011 Ari Russo and licensed under the Apache 2.0 License
-# 
 module Nibbler
 
-  # this is where it all starts
+  # this is where messages go
   class Parser
 
     extend Forwardable
@@ -64,6 +62,7 @@ module Nibbler
       # 0 messages: nil
       # 1 message: the message
       # >1 message: an array of messages
+      # might make sense to make this an array no matter what...
       parsed[:messages].length < 2 ? (parsed[:messages].empty? ? nil : parsed[:messages][0]) : parsed[:messages]
     end
   
