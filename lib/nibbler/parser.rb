@@ -10,13 +10,13 @@ module Nibbler
     extend Forwardable
 
     attr_reader :buffer,
-                :fragmented_messages,
                 :messages,
-                :processed_buffer
+                :processed_buffer,
+                :rejected_bytes
                 
     def_delegator :clear_buffer, :buffer, :clear
     def_delegator :clear_processed_buffer, :processed_buffer, :clear
-    def_delegator :clear_fragmented_messages, :fragmented_messages, :clear
+    def_delegator :clear_rejected_bytes, :rejected_bytes, :clear
     def_delegator :clear_messages, :messages, :clear
 
     def initialize(options = {})
@@ -30,7 +30,7 @@ module Nibbler
           require 'nibbler/midi-message_factory'
           @message_factory = MIDIMessageFactory.new
       end 
-      @buffer, @processed_buffer, @fragmented_messages, @messages = [], [], [], []
+      @buffer, @processed_buffer, @rejected_bytes, @messages = [], [], [], []
     end
     
     def all_messages
@@ -55,31 +55,82 @@ module Nibbler
     end
   
     def parse_buffer
-      
+      parsed = parse_bytes(*@buffer)
+      @messages += parsed[:messages]
+      @processed_buffer += parsed[:processed_bytes]
+      @rejected_bytes = parsed[:rejected_bytes]
+      @buffer = parsed[:remaining_bytes]
+      parsed[:messages]
     end
   
     def parse_bytes(*bytes)
-      first_nibble = bytes.first >> 4
-      second_nibble = bytes.first >> 8
-      case first_nibble
-        when 0x8 then @message_factory.note_off(second_nibble, bytes[1], bytes[2])
-        when 0x9 then @message_factory.note_on(second_nibble, bytes[1], bytes[2])
-        when 0xA then @message_factory.polyphonic_aftertouch(second_nibble, bytes[1], bytes[2])
-        when 0xB then @message_factory.control_change(second_nibble, bytes[1], bytes[2])
-        when 0xC then @message_factory.program_change(second_nibble, bytes[1])
-        when 0xD then @message_factory.channel_aftertouch(second_nibble, bytes[1])
-        when 0xE then @message_factory.pitch_bend(second_nibble, bytes[1], bytes[2])
-        when 0xF then case second_nibble
-          when 0x0 then @message_factory.system_exclusive(*bytes)
-          when 0x1..0x6 then @message_factory.system_common(second_nibble, bytes[1], bytes[2])
-          when 0x8..0xF then @message_factory.system_realtime(second_nibble)
-          else nil
+      output = { 
+        :messages => [], 
+        :processed_bytes => [], 
+        :remaining_bytes => bytes,
+        :rejected_bytes => [] 
+      }    
+      i = 0  
+      while i <= (output[:remaining_bytes].length - 1)
+        # iterate through bytes until a status message is found        
+        # see if there really is a message there
+        processed = bytes_to_message(output[:remaining_bytes])     
+        unless processed[:message].nil?
+          # if it's a real message, reject previous bytes
+          output[:rejected_bytes] += output[:remaining_bytes].slice(0, i + 1)
+          # and record it          
+          output[:remaining_bytes] = processed[:remaining]
+          output[:messages] << processed[:message]
+          output[:processed_bytes] = processed[:processed]
         end
-        else parse_bytes(bytes.slice(1, bytes.length-1))
+        i += 1  
       end
+      output
+    end
+    
+    def bytes_to_message(bytes)
+      output = { 
+        :message => nil, 
+        :processed => [], 
+        :remaining => nil 
+      }
+      first = bytes[0]
+      first_nibble = first >> 4
+      second_nibble = first >> 8
+      output[:message], output[:processed] = *case first_nibble
+        when 0x8 then with_bytes(3, bytes) { |b| @message_factory.note_off(second_nibble, b[0], b[1]) }
+        when 0x9 then with_bytes(3, bytes) { |b| @message_factory.note_on(second_nibble, b[0], b[1]) }
+        when 0xA then with_bytes(3, bytes) { |b| @message_factory.polyphonic_aftertouch(second_nibble, b[0], b[1]) }
+        when 0xB then with_bytes(3, bytes) { |b| @message_factory.control_change(second_nibble, b[0], b[1]) }
+        when 0xC then with_bytes(2, bytes) { |b| @message_factory.program_change(second_nibble, b[0]) }
+        when 0xD then with_bytes(2, bytes) { |b| @message_factory.channel_aftertouch(second_nibble, b[0]) }
+        when 0xE then with_bytes(3, bytes) { |b| @message_factory.pitch_bend(second_nibble, b[0], b[1]) }
+        when 0xF then case second_nibble
+          when 0x0 then with_sysex_bytes(bytes) { |b| @message_factory.system_exclusive(*b) }
+          when 0x1..0x6 then with_bytes(3, bytes) { |b| @message_factory.system_common(second_nibble, b[0], b[1]) }
+          when 0x8..0xF then @message_factory.system_realtime(second_nibble)
+        end
+      end
+      output[:remaining] = bytes
+      output
     end
     
     private
+    
+    def with_bytes(num, bytes, &block)              
+      if bytes.slice(0, num).length >= num
+        msg = bytes.slice!(0, num)
+        [block.call(msg.slice(1, num-1)), msg]
+      end  
+    end
+    
+    def with_sysex_bytes(bytes, &block)
+      ind = bytes.index(0xF7)      
+      unless ind.nil?
+        msg = block.call(bytes.slice!(0, ind + 1))
+        [msg, bytes]
+      end 
+    end
     
     # returns an array of bytes
     def to_bytes(*a)

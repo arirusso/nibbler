@@ -10,11 +10,11 @@ module Nibbler
     include MIDIMessage
     
     def note_off(second_nibble, data_byte_1, data_byte_2)
-      NoteOff.new(second_nibble, @data[1], @data[2])
+      NoteOff.new(second_nibble, data_byte_1, data_byte_2)
     end
     
     def note_on(second_nibble, data_byte_1, data_byte_2)
-      NoteOn.new(second_nibble, @data[1], @data[2])
+      NoteOn.new(second_nibble, data_byte_1, data_byte_2)
     end
     
     def polyphonic_aftertouch(second_nibble, data_byte_1, data_byte_2)
