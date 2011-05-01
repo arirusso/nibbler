@@ -85,7 +85,7 @@ See progress
   p nibbler.buffer_hex
   ["9", "40"]
   
-Nibbler defaults to use {midi-message}[http://github.com/arirusso/midi-message] but it is also possible to generate {midilib}[https://github.com/jimm/midilib] messages: 
+Nibbler defaults to use {midi-message}[http://github.com/arirusso/midi-message] but it is also possible to generate {midilib}[https://github.com/jimm/midilib] message/event objects: 
 
   Nibbler.new(:message_lib => :midilib)
   
