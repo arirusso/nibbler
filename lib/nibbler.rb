@@ -63,7 +63,7 @@ module Nibbler
     
     private
     
-    # this will return an array of bytes
+    # returns an array of bytes
     def to_bytes(*a)
       buf = []
       a.each do |thing|
@@ -76,6 +76,7 @@ module Nibbler
       buf.compact 
     end
     
+    # converts a string of hex digits to bytes
     def bytestr_to_bytes(str)
       return [str.hex] if str.length.eql?(1)
       output = []
@@ -85,6 +86,8 @@ module Nibbler
       output       
     end
     
+    # limit <em>byte</em> to bytes usable in MIDI ie values (0..240)
+    # returns nil if the byte is outside of that range
     def sanitize_numeric(byte)
       (0..240).include?(byte) ? byte : nil
     end
