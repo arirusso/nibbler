@@ -86,7 +86,7 @@ See progress
   p nibbler.buffer_hex
   ["9", "40"]
   
-Using {midilib}(https://github.com/jimm/midilib).  Nibbler defaults to use {midi-message}[http://github.com/arirusso/midi-message] if no :message_lib is specified 
+Using {midilib}[https://github.com/jimm/midilib].  (Nibbler defaults to use {midi-message}[http://github.com/arirusso/midi-message] if no :message_lib is specified) 
 
   Nibbler.new(:message_lib => :midilib)
 
