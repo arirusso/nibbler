@@ -1,10 +1,10 @@
-status (4/30/2011): not working yet
-
 = nibbler
 
 {cat on arp}[http://images.treetrouble.net/images/dog_with_synth.jpg]
 
 Parse MIDI Messages
+
+status (4/30/2011): somewhat working
 
 == Requirements
 
@@ -85,7 +85,7 @@ See progress
   p nibbler.buffer_hex
   ["9", "40"]
   
-Using {midilib}[https://github.com/jimm/midilib]  (Nibbler defaults to use {midi-message}[http://github.com/arirusso/midi-message] if no :message_lib is specified) 
+Nibbler defaults to use {midi-message}[http://github.com/arirusso/midi-message] but it is also possible to generate {midilib}[https://github.com/jimm/midilib] messages: 
 
   Nibbler.new(:message_lib => :midilib)
   
