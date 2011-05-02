@@ -6,59 +6,11 @@ module Nibbler
   # this is where messages go
   class Parser
 
-    extend Forwardable
-
-    attr_reader :buffer,
-                :messages,
-                :processed,
-                :rejected
-                
-    def_delegator :clear_buffer, :buffer, :clear
-    def_delegator :clear_processed, :processed, :clear
-    def_delegator :clear_rejected, :rejected, :clear
-    def_delegator :clear_messages, :messages, :clear
-
-    def initialize(options = {})
-      case options[:message_lib]
-        when :midilib then
-          require 'midilib'
-          require 'nibbler/midilib_factory'
-          @message_factory = MidilibFactory.new 
-        else
-          require 'midi-message'
-          require 'nibbler/midi-message_factory'
-          @message_factory = MIDIMessageFactory.new
-      end 
-      @buffer, @processed, @rejected, @messages = [], [], [], []
-      @typefilter = TypeFilter.new
-    end
-    
-    def all_messages
-      @messages | @fragmented_messages
-    end
-    
-    def buffer_hex
-      @buffer.join
-    end
-
-    def clear_buffer
-      @buffer.clear
-    end
-
-    def clear_messages
-      @messages.clear
-    end
-
-    def parse(*a)
-      @buffer += @typefilter.to_nibbles(a)
-      process_buffer
-    end
-  
-    def process_buffer
+    def process(nibbles)
       output = { 
         :messages => [], 
         :processed => [], 
-        :remaining => @buffer,
+        :remaining => nibbles,
         :rejected => [] 
       }    
       i = 0  
@@ -76,17 +28,7 @@ module Nibbler
         end
         i += 1  
       end
-      
-      @messages += output[:messages]
-      @processed += output[:processed]
-      @rejected = output[:rejected]
-      @buffer = output[:remaining]
-      # return type
-      # 0 messages: nil
-      # 1 message: the message
-      # >1 message: an array of messages
-      # might make sense to make this an array no matter what...
-      output[:messages].length < 2 ? (output[:messages].empty? ? nil : output[:messages][0]) : output[:messages]
+      output
     end
     
     def nibbles_to_message(nibbles)

@@ -6,6 +6,7 @@
 
 require 'forwardable'
 
+require 'nibbler/nibbler'
 require 'nibbler/parser'
 require 'nibbler/type_filter'
 
@@ -18,7 +19,7 @@ module Nibbler
 
   # shortcut to Parser.new
   def self.new(*a)
-    Parser.new(*a)
+    Nibbler.new(*a)
   end
 
 end

@@ -2,7 +2,7 @@
 
 require File.dirname(__FILE__) + '/test_helper'
 
-class LowlevelTest < Test::Unit::TestCase
+class ParserTest < Test::Unit::TestCase
 
   include Nibbler
   include TestHelper
