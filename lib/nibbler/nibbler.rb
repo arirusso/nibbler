@@ -19,8 +19,8 @@ module Nibbler
 
     def initialize(options = {})
       @buffer, @processed, @rejected, @messages = [], [], [], []
-      @parser = Parser.new      
-      @typefilter = TypeFilter.new
+      @parser = Parser.new(options)    
+      @typefilter = HexCharArrayFilter.new
     end
     
     def all_messages
@@ -40,8 +40,8 @@ module Nibbler
     end
 
     def parse(*a)
-      @buffer += @typefilter.to_nibbles(a)
-      result = process_buffer(@buffer)
+      @buffer += @typefilter.process(a)
+      result = @parser.process(@buffer)
       @messages += result[:messages]
       @processed += result[:processed]
       @rejected = result[:rejected]
@@ -57,5 +57,7 @@ module Nibbler
         result[:messages]
       end
     end
+    
+  end
   
 end

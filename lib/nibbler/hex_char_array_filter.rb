@@ -2,10 +2,11 @@
 #
 module Nibbler  
   
-  class TypeFilter
+  # Turns various types of input in to an array of hex digit chars
+  class HexCharArrayFilter
        
     # returns an array of hex string nibbles
-    def to_nibbles(*a)
+    def process(*a)
       a.flatten!
       buf = []
       a.each do |thing|
