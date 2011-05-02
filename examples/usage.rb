@@ -49,3 +49,9 @@ pp nibbler.parse("40")
 pp nibbler.buffer # should give you an array of bits
 
 pp nibbler.buffer_hex # should give you an array of bytestrs
+
+# Nibbler defaults to generate {midi-message}[http://github.com/arirusso/midi-message] message objects, but it is also possible to use {midilib}[https://github.com/jimm/midilib]
+
+midilib_nibbler = Nibbler.new(:message_lib => :midilib)
+  
+pp midilib_nibbler.parse("9", "0", 0x40, "40")
