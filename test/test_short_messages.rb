@@ -59,13 +59,13 @@ class ShortMessageTest < Test::Unit::TestCase
     assert_equal(0x50, msg.value)  
   end  
     
-  def test_channel_aftertouch
+  def test_pitch_bend
     nibbler = Nibbler.new
-    msg = nibbler.parse(0xE0, 0x50, 0xA0)
+    msg = nibbler.parse(0xE0, 0x20, 0x00) # center
     assert_equal(MIDIMessage::PitchBend, msg.class)
     assert_equal(0, msg.channel)
-    assert_equal(0x50, msg.low)
-    assert_equal(0xA0, msg.high)  
+    assert_equal(0x20, msg.low)
+    assert_equal(0x00, msg.high)  
   end   
    
   def test_system_common
@@ -76,6 +76,21 @@ class ShortMessageTest < Test::Unit::TestCase
     assert_equal(0x50, msg.data[0])
     assert_equal(0xA0, msg.data[1])  
   end    
+
+  def test_system_common_2_bytes
+    nibbler = Nibbler.new
+    msg = nibbler.parse(0xF1, 0x50)
+    assert_equal(MIDIMessage::SystemCommon, msg.class)
+    assert_equal(1, msg.status[1])
+    assert_equal(0x50, msg.data[0])  
+  end    
+
+  def test_system_common_1_byte
+    nibbler = Nibbler.new
+    msg = nibbler.parse(0xF1)
+    assert_equal(MIDIMessage::SystemCommon, msg.class)
+    assert_equal(1, msg.status[1])
+  end    
   
   def test_system_realtime
     nibbler = Nibbler.new
@@ -83,9 +98,5 @@ class ShortMessageTest < Test::Unit::TestCase
     assert_equal(MIDIMessage::SystemRealtime, msg.class)
     assert_equal(8, msg.id)
   end        
-  
-  def test_multiple
-    
-  end
    
 end

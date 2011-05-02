@@ -67,7 +67,7 @@ module Nibbler
         when 0xE then lookahead(6, nibbles) { |bytes| @message_factory.pitch_bend(second, bytes[1], bytes[2]) }
         when 0xF then case second
           when 0x0 then lookahead_sysex(nibbles) { |bytes| @message_factory.system_exclusive(*bytes) }
-          when 0x1..0x6 then lookahead(6, nibbles) { |bytes| @message_factory.system_common(second, bytes[1], bytes[2]) }
+          when 0x1..0x6 then lookahead(6, nibbles, :recursive => true) { |bytes| @message_factory.system_common(second, bytes[1], bytes[2]) }
           when 0x8..0xF then lookahead(2, nibbles) { |bytes| @message_factory.system_realtime(second) }
         end
       end
@@ -77,7 +77,8 @@ module Nibbler
     
     private
     
-    def lookahead(num, nibbles, &block)
+    def lookahead(num, nibbles, options = {}, &block)
+      recursive = !options[:recursive].nil? && options[:recursive] 
       processed = []
       msg = nil               
       # do we have enough nibbles for num bytes?
@@ -88,6 +89,8 @@ module Nibbler
         # return the evaluated block and the remaining nibbles       
         bytes = TypeConversion.hex_chars_to_bytes(processed)
         msg = block.call(bytes)
+      elsif num > 0 && recursive
+        msg, processed = *lookahead(num-2, nibbles, options, &block)
       end
       [msg, processed]
     end
