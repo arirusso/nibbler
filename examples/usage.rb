@@ -29,11 +29,11 @@ pp nibbler.parse(0x90, 0x40, 0x40) # this should return a message
 
 # Use nibbles
 
-pp nibbler.parse(0x9, 0x0, 0x40, 0x40) # this should return a message
+pp nibbler.parse("9", "0", 0x40, 0x40) # this should return a message
 
 # Use nibbles and bytes and strings
 
-pp nibbler.parse(0x9, "0", "4040") # this should return a message
+pp nibbler.parse("9", "0", "4040") # this should return a message
 
 # Look at the messages we’ve parsed
 

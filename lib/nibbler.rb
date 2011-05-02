@@ -7,6 +7,7 @@
 require 'forwardable'
 
 require 'nibbler/parser'
+require 'nibbler/type_filter'
 
 #
 # Parse MIDI Messages

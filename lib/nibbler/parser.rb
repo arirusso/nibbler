@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #
 module Nibbler
+ 
 
   # this is where messages go
   class Parser
@@ -29,6 +30,7 @@ module Nibbler
           @message_factory = MIDIMessageFactory.new
       end 
       @buffer, @processed, @rejected, @messages = [], [], [], []
+      @typefilter = TypeFilter.new
     end
     
     def all_messages
@@ -36,7 +38,7 @@ module Nibbler
     end
     
     def buffer_hex
-      @buffer.values.map { |b| s = b.to_s(16); s.length.eql?(1) ? "0#{s}" : s }.join.upcase
+      @buffer.map { |b| s = b.to_s(16); s.length.eql?(1) ? "0#{s}" : s }.join.upcase
     end
 
     def clear_buffer
@@ -48,7 +50,7 @@ module Nibbler
     end
 
     def parse(*a)
-      @buffer += to_nibbles(a)
+      @buffer += @typefilter.to_nibbles(a)
       process_buffer
     end
   
@@ -63,7 +65,7 @@ module Nibbler
       while i <= (output[:remaining].length - 1)
         # iterate through nibbles until a status message is found        
         # see if there really is a message there
-        processed = nibbles_to_message(output[:remaining])     
+        processed = nibbles_to_message(output[:remaining])
         unless processed[:message].nil?
           # if it's a real message, reject previous nibbles
           output[:rejected] += output[:remaining].slice(0, i + 1)
@@ -74,6 +76,7 @@ module Nibbler
         end
         i += 1  
       end
+      
       @messages += output[:messages]
       @processed += output[:processed]
       @rejected = output[:rejected]
@@ -92,8 +95,9 @@ module Nibbler
         :processed => [], 
         :remaining => nil 
       }
-      first = nibbles[0]
-      second = nibbles[1]
+      first = nibbles[0].hex
+      second = nibbles[1].hex
+      
       output[:message], output[:processed] = *case first
         when 0x8 then only_with_bytes(3, nibbles) { |b| @message_factory.note_off(second, b[1], b[2]) }
         when 0x9 then only_with_bytes(3, nibbles) { |b| @message_factory.note_on(second, b[1], b[2]) }
@@ -123,21 +127,21 @@ module Nibbler
         # if so shift those nubbles off of the array and call block with them
         processed += nibbles.slice!(0, num_nibs)
         # send the nibbles to the block as bytes         
-        # return the evaluated block and the remaining nibbles        
+        # return the evaluated block and the remaining nibbles       
         bytes = nibbles_to_bytes(processed)
         msg = block.call(bytes)
       end
       [msg, processed]
     end
     
-    def nibbles_to_bytes(nibbles)     
+    def nibbles_to_bytes(nibbles)
       nibbles = nibbles.dup
       # get rid of last nibble if there's an odd number
       # it will be processed later anyway
       nibbles.slice!(nibbles.length-2, 1) if nibbles.length.odd?
       bytes = []
       while !(nibs = nibbles.slice!(0,2)).empty?
-        byte = (nibs[0] << 4) + nibs[1]
+        byte = (nibs[0].hex << 4) + nibs[1].hex
         bytes << byte
       end
       bytes
@@ -155,37 +159,6 @@ module Nibbler
       [msg, processed]
     end
     
-    # returns an array of nibbles
-    def to_nibbles(*a)
-      a.flatten!
-      buf = []
-      a.each do |thing|
-        buf += case thing
-          when Array then thing.map { |arr| to_nibbles(*arr) }.inject { |a,b| a + b }
-          when String then hexstr_to_nibbles(thing)
-          when Numeric then byte_to_nibbles(filter_numeric(thing))
-        end
-      end
-      buf.compact 
-    end
-    
-    # converts a string of hex digits to bytes
-    def hexstr_to_nibbles(str)
-      o = []
-      str.each_char { |c| o << c.hex }
-      o      
-    end
-    
-    # limit <em>num</em> to bytes usable in MIDI ie values (0..240)
-    # returns nil if the byte is outside of that range
-    def filter_numeric(num)
-      (0x00..0xFF).include?(num) ? num : nil
-    end
-    
-    def byte_to_nibbles(num)
-      [((num & 0xF0) >> 4), (num & 0x0F)]      
-    end
-  
   end
 
 end
