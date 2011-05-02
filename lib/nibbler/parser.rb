@@ -38,7 +38,7 @@ module Nibbler
     end
     
     def buffer_hex
-      @buffer.map { |b| s = b.to_s(16); s.length.eql?(1) ? "0#{s}" : s }.join.upcase
+      @buffer.join
     end
 
     def clear_buffer
@@ -95,6 +95,10 @@ module Nibbler
         :processed => [], 
         :remaining => nil 
       }
+      if nibbles.length < 2
+        output[:remaining] = nibbles
+        return output
+      end
       first = nibbles[0].hex
       second = nibbles[1].hex
       

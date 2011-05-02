@@ -15,7 +15,7 @@ module Nibbler
           when Numeric then numbyte_to_nibbles(filter_numeric(thing))
         end
       end
-      buf.compact 
+      buf.compact.map { |n| n.upcase } 
     end
     
     private
