@@ -7,6 +7,12 @@ class NibblerTest < Test::Unit::TestCase
   include Nibbler
   include TestHelper
   
+  def test_varying_length_strings
+    nibbler = Nibbler.new
+    msg = nibbler.parse("9", "04", "040")
+    assert_equal(MIDIMessage::NoteOn, msg.class)
+  end
+  
   def test_note_off
     nibbler = Nibbler.new
     msg = nibbler.parse(0x80, 0x40, 0x40)

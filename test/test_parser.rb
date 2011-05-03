@@ -6,8 +6,18 @@ class ParserTest < Test::Unit::TestCase
 
   include Nibbler
   include TestHelper
-    
+  
   def test_lookahead
+    parser = Parser.new
+    num = 6
+    nibbles = ["9", "0", "4", "0", "5", "0"]
+    outp = parser.send(:lookahead, num, nibbles) { |bytes| bytes }
+    assert_equal([0x90, 0x40, 0x50], outp[0])
+    assert_equal(["9", "0", "4", "0", "5", "0"], outp[1])    
+    assert_equal([], nibbles)
+  end
+    
+  def test_lookahead_trailing
     parser = Parser.new
     num = 6
     nibbles = ["9", "0", "4", "0", "5", "0", "5", "0"]
@@ -43,6 +53,32 @@ class ParserTest < Test::Unit::TestCase
     assert_equal(nil, outp[0])
     assert_equal([], outp[1])        
     assert_equal(["9", "0", "4"], nibbles)
+  end
+  
+  def test_process
+    parser = Parser.new
+    short = ['9', '0', '4', '0', '5', '0', '5', '0']
+    outp = parser.send(:process, short)
+    assert_equal(MIDIMessage::NoteOn, outp[:messages].first.class)
+    assert_equal(['5', '0'], outp[:remaining])
+    assert_equal(['9', '0', '4', '0', '5', '0'], outp[:processed])
+  end
+  
+  def test_nibbles_to_message_leading
+    parser = Parser.new
+    short = ["5", "0", '9', '0', '4', '0', '5', '0']
+    outp = parser.send(:nibbles_to_message, short)
+    assert_equal(["5", "0", '9', '0', '4', '0', '5', '0'], outp[:remaining])
+    assert_equal(nil, outp[:message])
+  end
+  
+  def test_nibbles_to_message_trailing
+    parser = Parser.new
+    short = ['9', '0', '4', '0', '5', '0', '5', '0']
+    outp = parser.send(:nibbles_to_message, short)
+    assert_equal(MIDIMessage::NoteOn, outp[:message].class)
+    assert_equal(['5', '0'], outp[:remaining])
+    assert_equal(['9', '0', '4', '0', '5', '0'], outp[:processed])
   end
   
   def test_nibbles_to_message

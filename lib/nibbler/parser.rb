@@ -30,10 +30,11 @@ module Nibbler
       while i <= (output[:remaining].length - 1)
         # iterate through nibbles until a status message is found        
         # see if there really is a message there
-        processed = nibbles_to_message(output[:remaining])
+        processed = nibbles_to_message(output[:remaining][i, (output[:remaining].length - i)])
         unless processed[:message].nil?
           # if it's a real message, reject previous nibbles
-          output[:rejected] += output[:remaining].slice(0, i + 1)
+          output[:rejected] += output[:remaining].slice(0, i)
+          
           # and record it          
           output[:remaining] = processed[:remaining]
           output[:messages] << processed[:message]
@@ -45,6 +46,7 @@ module Nibbler
     end
     
     def nibbles_to_message(nibbles)
+      nibbles = nibbles.dup
       output = { 
         :message => nil, 
         :processed => [], 
