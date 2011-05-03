@@ -39,13 +39,15 @@ module Nibbler
       SystemExclusive.new(*a)
     end
     
-    def system_common(second_nibble, data_byte_1, data_byte_2)
+    def system_common(second_nibble, data_byte_1 = nil, data_byte_2 = nil)
       SystemCommon.new(second_nibble, data_byte_1, data_byte_2)
     end
     
     def system_realtime(second_nibble)
       SystemRealtime.new(second_nibble)
-    end    
+    end
+    
+        
   
   end
 
