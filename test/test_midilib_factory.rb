@@ -71,6 +71,69 @@ class MidilibFactoryTest < Test::Unit::TestCase
     assert_equal(MIDI::PitchBend, msg.class)
     assert_equal(0, msg.channel)
     assert_equal(0x20, msg.value) 
-  end   
-   
+  end
+  
+  def test_system_exclusive
+    factory = MidilibFactory.new
+    msg = factory.system_exclusive(0xF0, 0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7)   
+    assert_equal(MIDI::SystemExclusive, msg.class)
+    assert_equal([0xF0, 0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7], msg.data)
+  end
+  
+  def test_song_pointer
+    factory = MidilibFactory.new
+    msg = factory.system_common(0x2, 0xF0)
+    assert_equal(MIDI::SongPointer, msg.class)
+    assert_equal(0xF0, msg.pointer)
+  end
+  
+  def test_song_select
+    factory = MidilibFactory.new
+    msg = factory.system_common(0x3, 0xA0)
+    assert_equal(MIDI::SongSelect, msg.class)
+    assert_equal(0xA0, msg.song)
+  end
+  
+  def test_tune_request
+    factory = MidilibFactory.new
+    msg = factory.system_common(0x6)
+    assert_equal(MIDI::TuneRequest, msg.class)
+  end
+  
+  def test_clock
+    factory = MidilibFactory.new
+    msg = factory.system_realtime(0x8)
+    assert_equal(MIDI::Clock, msg.class)
+  end    
+
+  def test_start
+    factory = MidilibFactory.new
+    msg = factory.system_realtime(0xA)
+    assert_equal(MIDI::Start, msg.class)
+  end     
+  
+  def test_continue
+    factory = MidilibFactory.new
+    msg = factory.system_realtime(0xB)
+    assert_equal(MIDI::Continue, msg.class)
+  end
+  
+  def test_stop
+    factory = MidilibFactory.new
+    msg = factory.system_realtime(0xC)
+    assert_equal(MIDI::Stop, msg.class)
+  end    
+  
+  def test_stop
+    factory = MidilibFactory.new
+    msg = factory.system_realtime(0xE)
+    assert_equal(MIDI::ActiveSense, msg.class)
+  end       
+
+  def test_stop
+    factory = MidilibFactory.new
+    msg = factory.system_realtime(0xF)
+    assert_equal(MIDI::SystemReset, msg.class)
+  end       
+    
 end
