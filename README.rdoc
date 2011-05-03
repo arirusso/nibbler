@@ -30,11 +30,11 @@ Enter a message piece by piece
   # #<MIDIMessage::NoteOn:0x98c9818 
   #  @channel=0, 
   #  @data=[64, 100], 
-  #	 @name="C3", 
-  #	 @note=64, 
-  #	 @status=[9, 0], 
-  #	 @velocity=100, 
-  #	 @verbose_name="Note On: C3">
+  #  @name="C3", 
+  #  @note=64, 
+  #  @status=[9, 0], 
+  #  @velocity=100, 
+  #  @verbose_name="Note On: C3">
   
 Enter a message all at once
   
@@ -43,11 +43,11 @@ Enter a message all at once
   # #<MIDIMessage::NoteOn:0x98c9818 
   #  @channel=0, 
   #  @data=[64, 100], 
-  #	 @name="C3", 
-  #	 @note=64, 
-  #	 @status=[9, 0], 
-  #	 @velocity=100, 
-  #	 @verbose_name="Note On: C3">
+  #  @name="C3", 
+  #  @note=64, 
+  #  @status=[9, 0], 
+  #  @velocity=100, 
+  #  @verbose_name="Note On: C3">
   
 Use bytes
   
