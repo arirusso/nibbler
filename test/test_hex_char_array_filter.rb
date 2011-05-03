@@ -51,4 +51,11 @@ class HexCharArrayFilterTest < Test::Unit::TestCase
     assert_equal(50, output)     
   end
   
+  def test_filter_string
+    filter = HexCharArrayFilter.new
+    str = "(0xAdjskla#(#"
+    outp = filter.send(:filter_string, str)
+    assert_equal("0ADA", outp)
+  end
+  
 end

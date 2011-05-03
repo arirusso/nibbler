@@ -12,7 +12,7 @@ module Nibbler
       a.each do |thing|
         buf += case thing
           when Array then thing.map { |arr| to_nibbles(*arr) }.inject { |a,b| a + b }
-          when String then TypeConversion.hex_str_to_hex_chars(thing)
+          when String then TypeConversion.hex_str_to_hex_chars(filter_string(thing))
           when Numeric then TypeConversion.numeric_byte_to_hex_chars(filter_numeric(thing))
         end
       end
@@ -25,6 +25,11 @@ module Nibbler
     # returns nil if the byte is outside of that range
     def filter_numeric(num)
       (0x00..0xFF).include?(num) ? num : nil
+    end
+    
+    # get rid of non-hex string characters
+    def filter_string(str)
+      str.gsub(/[^0-9a-fA-F]/, '').upcase
     end
   
   end
