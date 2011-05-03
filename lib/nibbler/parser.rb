@@ -87,7 +87,7 @@ module Nibbler
         processed += nibbles.slice!(0, num)
         # send the nibbles to the block as bytes         
         # return the evaluated block and the remaining nibbles       
-        bytes = TypeConversion.hex_chars_to_bytes(processed)
+        bytes = TypeConversion.hex_chars_to_numeric_bytes(processed)
         msg = block.call(bytes)
       elsif num > 0 && recursive
         msg, processed = *lookahead(num-2, nibbles, options, &block)
@@ -96,7 +96,7 @@ module Nibbler
     end
         
     def lookahead_sysex(nibbles, &block)
-      bytes = TypeConversion.hex_chars_to_bytes(nibbles)
+      bytes = TypeConversion.hex_chars_to_numeric_bytes(nibbles)
       ind = bytes.index(0xF7)
       processed = []
       msg = nil      

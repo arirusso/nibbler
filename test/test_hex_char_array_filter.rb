@@ -38,23 +38,7 @@ class HexCharArrayFilterTest < Test::Unit::TestCase
     assert_equal("904050", str)
     assert_equal(["9", "0", "4", "0", "5", "0"], nibbles)     
   end
-  
-  def test_hexstr_to_nibbles
-    filter = HexCharArrayFilter.new
-    str = "904050"
-    nibbles = filter.send(:hexstr_to_nibbles, str)
-    assert_equal("904050", str)
-    assert_equal(["9", "0", "4", "0", "5", "0"], nibbles)    
-  end
-  
-  def test_numbyte_to_nibbles
-    filter = HexCharArrayFilter.new
-    num = 0x90
-    nibbles = filter.send(:numbyte_to_nibbles, num)
-    assert_equal(0x90, num)
-    assert_equal(["9", "0"], nibbles)     
-  end         
-  
+    
   def test_filter_numeric
     filter = HexCharArrayFilter.new
     badnum = 560

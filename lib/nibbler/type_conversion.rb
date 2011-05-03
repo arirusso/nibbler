@@ -5,7 +5,7 @@ module Nibbler
   # this is a helper for converting nibbles and bytes
   module TypeConversion
     
-    def self.hex_chars_to_bytes(nibbles)
+    def self.hex_chars_to_numeric_bytes(nibbles)
       nibbles = nibbles.dup
       # get rid of last nibble if there's an odd number
       # it will be processed later anyway
@@ -16,6 +16,15 @@ module Nibbler
         bytes << byte
       end
       bytes
+    end
+    
+    # converts a string of hex digits to bytes
+    def self.hex_str_to_hex_chars(str)
+      str.split(//)    
+    end
+    
+    def self.numeric_byte_to_hex_chars(num)
+      [((num & 0xF0) >> 4), (num & 0x0F)].map { |n| n.to_s(16) }      
     end
 
     
