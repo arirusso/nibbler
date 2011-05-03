@@ -7,10 +7,6 @@ module Nibbler
   class MidilibFactory
     
     include MIDI
-  
-    def initialize
-      require 'midilib'
-    end
     
     def note_off(second_nibble, data_byte_1, data_byte_2)
       NoteOff.new(second_nibble, data_byte_1, data_byte_2)
@@ -37,19 +33,32 @@ module Nibbler
     end
     
     def pitch_bend(second_nibble, data_byte_1, data_byte_2)
+      # to-do handle the midilib lsb/msb
+      # right now the second data byte is being thrown away
       PitchBend.new(second_nibble, data_byte_1, data_byte_2)
     end
     
     def system_exclusive(*a)
-      SystemExclusive.new(*a)
+      SystemExclusive.new(a)
     end
     
-    def system_common(second_nibble, data_byte_1, data_byte_2)
-      SystemCommon.new(second_nibble, data_byte_1, data_byte_2)
+    def system_common(second_nibble, data_byte_1 = nil, data_byte_2 = nil)
+      case second_nibble
+        when 0x2 then SongPointer.new(data_byte_1) # similar issue to pitch bend here
+        when 0x3 then SongSelect.new(data_byte_1)
+        when 0x6 then TuneRequest.new
+      end      
     end
     
     def system_realtime(second_nibble)
-      SystemRealtime.new(second_nibble)
+      case second_nibble
+        when 0x8 then Clock.new
+        when 0xA then Start.new
+        when 0xB then Continue.new
+        when 0xC then Stop.new
+        when 0xE then ActiveSense.new
+        when 0xF then SystemReset.new
+      end      
     end  
     
   end
