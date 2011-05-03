@@ -67,8 +67,8 @@ Use nibbles and bytes and strings
 Look at the messages we've parsed
   
   p nibbler.messages
-  #<MIDIMessage::NoteOn:0x98c9818 ...>
-  #<MIDIMessage::NoteOn:0x98c9818 ...>
+  [#<MIDIMessage::NoteOn:0x98c9804 ...>
+   #<MIDIMessage::NoteOn:0x98c9811 ...>]
   
 Add an incomplete message
   
