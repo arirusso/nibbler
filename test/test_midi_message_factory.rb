@@ -2,14 +2,14 @@
 
 require 'test_helper'
 
-class ShortMessageTest < Test::Unit::TestCase
+class MIDIMessageFactoryTest < Test::Unit::TestCase
 
   include Nibbler
   include TestHelper
  
   def test_note_off
-    nibbler = Nibbler.new
-    msg = nibbler.parse(0x80, 0x40, 0x40)
+    factory = MIDIMessageFactory.new
+    msg = factory.note_off(0, 0x40, 0x40)
     assert_equal(MIDIMessage::NoteOff, msg.class)
     assert_equal(0, msg.channel)
     assert_equal(0x40, msg.note)
@@ -17,8 +17,8 @@ class ShortMessageTest < Test::Unit::TestCase
   end
   
   def test_note_on
-    nibbler = Nibbler.new
-    msg = nibbler.parse(0x90, 0x40, 0x40)
+    factory = MIDIMessageFactory.new
+    msg = factory.note_on(0x0, 0x40, 0x40)
     assert_equal(MIDIMessage::NoteOn, msg.class)
     assert_equal(0, msg.channel)
     assert_equal(0x40, msg.note)
@@ -26,8 +26,8 @@ class ShortMessageTest < Test::Unit::TestCase
   end  
   
   def test_polyphonic_aftertouch
-    nibbler = Nibbler.new
-    msg = nibbler.parse(0xA1, 0x40, 0x40)
+    factory = MIDIMessageFactory.new
+    msg = factory.polyphonic_aftertouch(0x1, 0x40, 0x40)
     assert_equal(MIDIMessage::PolyphonicAftertouch, msg.class)
     assert_equal(1, msg.channel)
     assert_equal(0x40, msg.note)
@@ -35,8 +35,8 @@ class ShortMessageTest < Test::Unit::TestCase
   end  
   
   def test_control_change
-    nibbler = Nibbler.new
-    msg = nibbler.parse(0xB2, 0x20, 0x20)
+    factory = MIDIMessageFactory.new
+    msg = factory.control_change(0x2, 0x20, 0x20)
     assert_equal(MIDIMessage::ControlChange, msg.class)
     assert_equal(msg.channel, 2)
     assert_equal(0x20, msg.number)
@@ -44,40 +44,40 @@ class ShortMessageTest < Test::Unit::TestCase
   end
   
   def test_program_change
-    nibbler = Nibbler.new
-    msg = nibbler.parse(0xC3, 0x40)
+    factory = MIDIMessageFactory.new
+    msg = factory.program_change(0x3, 0x40)
     assert_equal(MIDIMessage::ProgramChange, msg.class)
     assert_equal(3, msg.channel)
     assert_equal(0x40, msg.program)  
   end
   
   def test_channel_aftertouch
-    nibbler = Nibbler.new
-    msg = nibbler.parse(0xD3, 0x50)
+    factory = MIDIMessageFactory.new
+    msg = factory.channel_aftertouch(0x3, 0x50)
     assert_equal(MIDIMessage::ChannelAftertouch, msg.class)
     assert_equal(3, msg.channel)
     assert_equal(0x50, msg.value)  
   end  
     
   def test_pitch_bend
-    nibbler = Nibbler.new
-    msg = nibbler.parse(0xE0, 0x20, 0x00) # center
+    factory = MIDIMessageFactory.new
+    msg = factory.pitch_bend(0x0, 0x20, 0x00) # center
     assert_equal(MIDIMessage::PitchBend, msg.class)
     assert_equal(0, msg.channel)
     assert_equal(0x20, msg.low)
     assert_equal(0x00, msg.high)  
   end   
    
-  def test_system_common
-    nibbler = Nibbler.new
-    msg = nibbler.parse(0xF1, 0x50, 0xA0)
+  def test_system_common_generic_3_bytes
+    factory = MIDIMessageFactory.new
+    msg = factory.system_common(0x1, 0x50, 0xA0)
     assert_equal(MIDIMessage::SystemCommon, msg.class)
     assert_equal(1, msg.status[1])
     assert_equal(0x50, msg.data[0])
     assert_equal(0xA0, msg.data[1])  
   end    
 
-  def test_system_common_2_bytes
+  def test_system_common_generic_2_bytes
     nibbler = Nibbler.new
     msg = nibbler.parse(0xF1, 0x50)
     assert_equal(MIDIMessage::SystemCommon, msg.class)
@@ -85,7 +85,7 @@ class ShortMessageTest < Test::Unit::TestCase
     assert_equal(0x50, msg.data[0])  
   end    
 
-  def test_system_common_1_byte
+  def test_system_common_generic_1_byte
     nibbler = Nibbler.new
     msg = nibbler.parse(0xF1)
     assert_equal(MIDIMessage::SystemCommon, msg.class)
