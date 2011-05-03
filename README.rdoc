@@ -10,7 +10,7 @@ Parse MIDI Messages
 	
 == Install
 
-  gem install midi-nibbler (not up yet)
+  gem install midi-nibbler
 
 == Usage
 
