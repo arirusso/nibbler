@@ -56,6 +56,10 @@ pp nibbler.buffer # should give you an array of bits
 
 pp nibbler.buffer_hex # should give you an array of bytestrs
 
+pp "Pass in a timestamp"
+
+pp nibbler.parse("904040", :timestamp => Time.now.to_i)
+
 pp "Generate midilib messages"
 
 midilib_nibbler = Nibbler.new(:message_lib => :midilib)

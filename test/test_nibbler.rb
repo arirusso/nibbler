@@ -31,6 +31,18 @@ class NibblerTest < Test::Unit::TestCase
     assert_equal(0x40, msg.velocity)  
   end  
   
+  def test_timestamp
+    nibbler = Nibbler.new
+    stamp = Time.now.to_i
+    outp = nibbler.parse(0x90, 0x40, 0x40, :timestamp => stamp)
+    msg = outp[:messages]
+    assert_equal(MIDIMessage::NoteOn, msg.class)
+    assert_equal(0, msg.channel)
+    assert_equal(0x40, msg.note)
+    assert_equal(0x40, msg.velocity)
+    assert_equal(stamp, outp[:timestamp])      
+  end
+  
   def test_polyphonic_aftertouch
     nibbler = Nibbler.new
     msg = nibbler.parse(0xA1, 0x40, 0x40)

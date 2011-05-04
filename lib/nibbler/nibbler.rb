@@ -43,6 +43,7 @@ module Nibbler
     end
 
     def parse(*a)
+      options = a.last.kind_of?(Hash) ? a.pop : nil 
       queue = @typefilter.process(a)
       result = @parser.process(queue)
       @messages += result[:messages]
@@ -54,11 +55,10 @@ module Nibbler
       # 1 message: the message
       # >1 message: an array of messages
       # might make sense to make this an array no matter what...
-      if result[:messages].length < 2 
-        (result[:messages].empty? ? nil : result[:messages][0])
-      else 
-        result[:messages]
-      end
+      output = result[:messages].length < 2 ? 
+        (result[:messages].empty? ? nil : result[:messages][0]) : result[:messages]
+      output = { :messages => output, :timestamp => options[:timestamp] } unless options.nil? || options[:timestamp].nil?
+      output
     end
     
   end

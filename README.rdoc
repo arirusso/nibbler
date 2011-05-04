@@ -88,6 +88,11 @@ See progress
   p nibbler.buffer_hex
   "940"
   
+Pass in a timestamp
+
+  p nibbler.parse("904040", :timestamp => Time.now)
+  # { :messages=> #<MIDIMessage::NoteOn:0x92f4564 ..>, :timestamp=>1304488440 } 
+  
 Nibbler defaults to generate {midi-message}[http://github.com/arirusso/midi-message] objects, but it is also possible to use {midilib}[https://github.com/jimm/midilib] 
 
   Nibbler.new(:message_lib => :midilib)
