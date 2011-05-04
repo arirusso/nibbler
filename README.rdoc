@@ -56,7 +56,7 @@ Use bytes
     
 You can use nibbles in string format
   
-  p nibbler.parse("9", "0", "4", "4", "0", "0")
+  p nibbler.parse("9", "0", "4", "0", "4", "0")
   #<MIDIMessage::NoteOn:0x98c9818 ...>
   
 Interchange the different types
@@ -83,12 +83,12 @@ Add an incomplete message
 See progress
   
   p nibbler.buffer
-  [9, 4, 0]
+  ["9", "4", "0"]
   
   p nibbler.buffer_hex
   "940"
   
-Nibbler defaults to generate {midi-message}[http://github.com/arirusso/midi-message] message objects, but it is also possible to use {midilib}[https://github.com/jimm/midilib] 
+Nibbler defaults to generate {midi-message}[http://github.com/arirusso/midi-message] objects, but it is also possible to use {midilib}[https://github.com/jimm/midilib] 
 
   Nibbler.new(:message_lib => :midilib)
   
