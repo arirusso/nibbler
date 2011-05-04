@@ -12,8 +12,8 @@ class ParserTest < Test::Unit::TestCase
     num = 6
     parser.send(:buffer=, ["9", "0", "4", "0", "5", "0"])
     parser.send(:populate_current)    
-    outp = parser.send(:lookahead, num) { |bytes| bytes }
-    assert_equal([0x90, 0x40, 0x50], outp[0])
+    outp = parser.send(:lookahead, num) { |nibble_2, bytes| [nibble_2, bytes] }
+    assert_equal([0,[0x90, 0x40, 0x50]], outp[0])
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[1])    
     assert_equal([], parser.send(:current))
   end
@@ -23,8 +23,8 @@ class ParserTest < Test::Unit::TestCase
     num = 6
     parser.send(:buffer=, ["9", "0", "4", "0", "5", "0", "5", "0"])
     parser.send(:populate_current)
-    outp = parser.send(:lookahead, num) { |bytes| bytes }
-    assert_equal([0x90, 0x40, 0x50], outp[0])
+    outp = parser.send(:lookahead, num) { |nibble_2, bytes| [nibble_2, bytes] }
+    assert_equal([0,[0x90, 0x40, 0x50]], outp[0])
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[1])    
     assert_equal(["5", "0"], parser.send(:current))
   end
@@ -34,7 +34,7 @@ class ParserTest < Test::Unit::TestCase
     num = 6
     parser.send(:buffer=, ["9", "0", "4"])
     parser.send(:populate_current)
-    outp = parser.send(:lookahead, num) { |b| b }
+    outp = parser.send(:lookahead, num) { |nibble_2, bytes| [nibble_2, bytes] }
     assert_equal(nil, outp[0])
     assert_equal([], outp[1])        
     assert_equal(["9", "0", "4"], parser.send(:current))
@@ -68,6 +68,17 @@ class ParserTest < Test::Unit::TestCase
     assert_equal(MIDIMessage::NoteOn, outp[:messages].first.class)
     assert_equal(['5', '0'], parser.buffer)
     assert_equal(['9', '0', '4', '0', '5', '0'], outp[:processed])
+  end
+  
+  def test_process_running_status
+    parser = Parser.new
+    two_msgs = ['9', '0', '4', '0', '5', '0', "4", "0", "6", "0"]
+    outp = parser.send(:process, two_msgs)
+    
+    assert_equal(MIDIMessage::NoteOn, outp[:messages][0].class)
+    #assert_equal(MIDIMessage::NoteOn, outp[:messages][1].class)
+    assert_equal([], parser.buffer)
+    assert_equal(['9', '0', '4', '0', '5', '0', "4", "0", "6", "0"], outp[:processed])
   end
   
   def test_process_multiple_overlapping_calls
@@ -116,6 +127,22 @@ class ParserTest < Test::Unit::TestCase
     assert_equal(MIDIMessage::NoteOn, outp[:message].class)
     assert_equal(['5', '0'], parser.send(:current))
     assert_equal(['9', '0', '4', '0', '5', '0'], outp[:processed])
+  end
+  
+  def test_nibbles_to_message_running_status
+    parser = Parser.new
+    short = ['9', '0', '4', '0', '5', '0']
+    parser.send(:buffer=, short)
+    parser.send(:populate_current)
+    outp = parser.send(:nibbles_to_message)
+    assert_equal(MIDIMessage::NoteOn, outp[:message].class)
+    
+    running_status = ["5", "0", "6", "0"]
+    parser.send(:buffer=, running_status)
+    parser.send(:populate_current)
+    outp = parser.send(:nibbles_to_message)
+    assert_equal(MIDIMessage::NoteOn, outp[:message].class)
+    assert_equal(["5", "0", "6", "0"], outp[:processed])
   end
   
   def test_nibbles_to_message_sysex
