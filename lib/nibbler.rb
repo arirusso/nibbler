@@ -19,8 +19,8 @@ module Nibbler
   VERSION = "0.0.2"
 
   # shortcut to Parser.new
-  def self.new(*a)
-    Nibbler.new(*a)
+  def self.new(*a, &block)
+    Nibbler.new(*a, &block)
   end
 
 end

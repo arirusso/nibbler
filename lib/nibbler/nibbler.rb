@@ -19,10 +19,11 @@ module Nibbler
     def_delegator :clear_rejected, :rejected, :clear
     def_delegator :clear_messages, :messages, :clear
 
-    def initialize(options = {})
+    def initialize(options = {}, &block)
       @processed, @rejected, @messages = [], [], []
       @parser = Parser.new(options)    
       @typefilter = HexCharArrayFilter.new
+      block.call unless block.nil?
     end
     
     def all_messages

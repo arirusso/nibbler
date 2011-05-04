@@ -9,48 +9,54 @@ $LOAD_PATH.unshift dir + '/../lib'
 require 'nibbler'
 require 'pp'
 
+
+
 nibbler = Nibbler.new
 
-# Enter a message piece by piece
+pp "Enter a message piece by piece"
 
 pp nibbler.parse("90")
 
 pp nibbler.parse("40")
 
-pp nibbler.parse("40") # this should return a message
+pp nibbler.parse("40")
 
-# Enter a message all at once
+pp "Enter a message all at once"
 
-pp nibbler.parse("904040") # this should return a message
+pp nibbler.parse("904040")
 
-#  Use bytes
+pp "Use Bytes"
 
 pp nibbler.parse(0x90, 0x40, 0x40) # this should return a message
 
-# Use nibbles
+pp "Use nibbles in string format"
 
 pp nibbler.parse("9", "0", 0x40, 0x40) # this should return a message
 
-# Use nibbles and bytes and strings
+pp "Interchange the different types"
+  
+pp nibbler.parse("9", "0", 0x40, 64)
+  
+pp "Use running status"
 
-pp nibbler.parse("9", "0", "4040") # this should return a message
+pp nibbler.parse(0x40, 64)
+  
+pp "Look at the messages we've parsed"
 
-# Look at the messages we’ve parsed
+pp nibbler.messages # this should return an array of messages
 
-p nibbler.messages # this should return an array of messages
-
-# Add an incomplete message
+pp "Add an incomplete message"
 
 pp nibbler.parse("9")
 pp nibbler.parse("40")
 
-#See progress
+pp "See progress"
 
 pp nibbler.buffer # should give you an array of bits
 
 pp nibbler.buffer_hex # should give you an array of bytestrs
 
-# Nibbler defaults to generate {midi-message}[http://github.com/arirusso/midi-message] message objects, but it is also possible to use {midilib}[https://github.com/jimm/midilib]
+pp "Generate midilib messages"
 
 midilib_nibbler = Nibbler.new(:message_lib => :midilib)
   
