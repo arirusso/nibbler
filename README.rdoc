@@ -85,7 +85,7 @@ See progress
   p nibbler.buffer
   ["9", "4", "0"]
   
-  p nibbler.buffer_hex
+  p nibbler.buffer_s
   "940"
   
 Pass in a timestamp

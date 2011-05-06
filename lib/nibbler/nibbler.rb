@@ -32,9 +32,10 @@ module Nibbler
       @messages | @fragmented_messages
     end
     
-    def buffer_hex
+    def buffer_s
       buffer.join
     end
+    alias_method :buffer_hex, :buffer_s
 
     def clear_buffer
       buffer.clear

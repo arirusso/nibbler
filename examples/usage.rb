@@ -54,7 +54,7 @@ pp "See progress"
 
 pp nibbler.buffer # should give you an array of bits
 
-pp nibbler.buffer_hex # should give you an array of bytestrs
+pp nibbler.buffer_s # should give you an array of bytestrs
 
 pp "Pass in a timestamp"
 
