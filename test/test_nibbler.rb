@@ -99,7 +99,7 @@ class NibblerTest < Test::Unit::TestCase
     msg = nibbler.parse(0xB2, 0x20, 0x20)
     assert_equal(MIDIMessage::ControlChange, msg.class)
     assert_equal(msg.channel, 2)
-    assert_equal(0x20, msg.number)
+    assert_equal(0x20, msg.index)
     assert_equal(0x20, msg.value)    
   end
   
