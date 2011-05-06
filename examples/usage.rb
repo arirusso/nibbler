@@ -60,6 +60,12 @@ pp "Pass in a timestamp"
 
 pp nibbler.parse("904040", :timestamp => Time.now.to_i)
 
+pp "Add callbacks"
+
+nibbler.when({ :class => MIDIMessage::NoteOn }) { puts "bark" }
+pp nibbler.parse("904040")
+pp nibbler.parse("804040")
+
 pp "Generate midilib messages"
 
 midilib_nibbler = Nibbler.new(:message_lib => :midilib)

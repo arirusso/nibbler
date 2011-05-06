@@ -7,7 +7,8 @@ module Nibbler
 
     extend Forwardable
 
-    attr_reader :messages,
+    attr_reader :callbacks,
+                :messages,
                 :processed,
                 :rejected
     
@@ -20,7 +21,8 @@ module Nibbler
     def_delegator :clear_messages, :messages, :clear
 
     def initialize(options = {}, &block)
-      @processed, @rejected, @messages = [], [], []
+      @timestamps = options[:timestamps] || false
+      @callbacks, @processed, @rejected, @messages = [], [], [], []
       @parser = Parser.new(options)    
       @typefilter = HexCharArrayFilter.new
       block.call unless block.nil?
@@ -41,24 +43,68 @@ module Nibbler
     def clear_messages
       @messages.clear
     end
+    
+    def use_timestamps
+      @messages = @messages.map do |m|
+        { :messages => m, :timestamp => nil }
+      end
+      @timestamps = true
+    end
 
     def parse(*a)
-      options = a.last.kind_of?(Hash) ? a.pop : nil 
+      options = a.last.kind_of?(Hash) ? a.pop : nil
+      timestamp = options[:timestamp] if !options.nil? && !options[:timestamp].nil?
+      use_timestamps if !timestamp.nil? && !@timestamps         
       queue = @typefilter.process(a)
       result = @parser.process(queue)
-      @messages += result[:messages]
+      record_message(result[:messages], timestamp)
+      handle_events(result[:messages]) unless @callbacks.empty?
       @processed += result[:processed]
       @rejected += result[:rejected]
-      #@buffer = result[:remaining]
+      get_parse_output(result[:messages], options)
+    end
+    
+    def when(hash, &proc)
+      if proc.nil?
+        warn "callback must have proc"
+        return false
+      end
+      hash[:proc] = proc
+      @callbacks << hash
+      true
+    end
+    alias_method :sees, :when
+    
+    private
+    
+    def handle_events(messages)
+      @callbacks.each do |cb|
+        messages.each do |msg|
+          match = true
+          cb.each do |key, val| 
+            match = false if !key.eql?(:proc) && !msg.send(key).eql?(val)
+          end           
+          cb[:proc].call(msg) if match   
+        end
+      end
+    end
+    
+    def record_message(msg, timestamp = nil)
+      !@timestamps ? @messages += msg : @messages << { 
+        :messages => msg, 
+        :timestamp => timestamp 
+      }     
+    end
+    
+    def get_parse_output(messages, options = nil)
       # return type
       # 0 messages: nil
       # 1 message: the message
       # >1 message: an array of messages
-      # might make sense to make this an array no matter what...
-      output = result[:messages].length < 2 ? 
-        (result[:messages].empty? ? nil : result[:messages][0]) : result[:messages]
-      output = { :messages => output, :timestamp => options[:timestamp] } unless options.nil? || options[:timestamp].nil?
-      output
+      # might make sense to make this an array no matter what...iii dunnoo
+      output = messages.length < 2 ? (messages.empty? ? nil : messages[0]) : messages
+      output = { :messages => output, :timestamp => options[:timestamp] } if @timestamps && !options.nil?
+      output      
     end
     
   end

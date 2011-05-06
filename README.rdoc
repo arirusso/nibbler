@@ -91,7 +91,15 @@ See progress
 Pass in a timestamp
 
   p nibbler.parse("904040", :timestamp => Time.now.to_i)
-  # { :messages=> #<MIDIMessage::NoteOn:0x92f4564 ..>, :timestamp=>1304488440 } 
+  # { :messages=> #<MIDIMessage::NoteOn:0x92f4564 ..>, :timestamp=>1304488440 }
+  
+Bind events
+
+  nibbler.when({ :class => MIDIMessage::NoteOn }) { puts "bark" }
+  p nibbler.parse("904040")
+  
+  "bark"
+  #<MIDIMessage::NoteOn:0x98c9818 ...>
   
 Nibbler defaults to generate {midi-message}[http://github.com/arirusso/midi-message] objects, but it is also possible to use {midilib}[https://github.com/jimm/midilib] 
 
