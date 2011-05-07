@@ -58,11 +58,23 @@ pp nibbler.buffer_s # should give you an array of bytestrs
 
 pp "Pass in a timestamp"
 
+# note:
+# once you pass in a timestamp for the first time, nibbler.messages will then return 
+# an array of message/timestamp hashes
+# if there was no timestamp for a particular message it will be nil
+#
+
 pp nibbler.parse("904040", :timestamp => Time.now.to_i)
 
 pp "Add callbacks"
 
-nibbler.when({ :class => MIDIMessage::NoteOn }) { puts "bark" }
+# you can list any properties of the message to check against. 
+# if they are all true, the callback will fire
+#
+# if you wish to use "or" or any more advanced matching I would just process the message after it's
+# returned
+#
+nibbler.when({ :class => MIDIMessage::NoteOn }) { |msg| puts "bark" } 
 pp nibbler.parse("904040")
 pp nibbler.parse("804040")
 

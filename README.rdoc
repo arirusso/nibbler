@@ -20,13 +20,13 @@ Parse MIDI Messages
 
 Enter a message piece by piece
   
-  p nibbler.parse("90")
+  nibbler.parse("90")
   nil
 
-  p nibbler.parse("40")
+  nibbler.parse("40")
   nil
 
-  p nibbler.parse("40")
+  nibbler.parse("40")
   # #<MIDIMessage::NoteOn:0x98c9818 
   #  @channel=0, 
   #  @data=[64, 100], 
@@ -38,7 +38,7 @@ Enter a message piece by piece
   
 Enter a message all at once
   
-  p nibbler.parse("904040")
+  nibbler.parse("904040")
   
   # #<MIDIMessage::NoteOn:0x98c9818 
   #  @channel=0, 
@@ -51,52 +51,52 @@ Enter a message all at once
   
 Use bytes
   
-  p nibbler.parse(0x90, 0x40, 0x40)
+  nibbler.parse(0x90, 0x40, 0x40)
   #<MIDIMessage::NoteOn:0x98c9818 ...>
     
 You can use nibbles in string format
   
-  p nibbler.parse("9", "0", "4", "0", "4", "0")
+  nibbler.parse("9", "0", "4", "0", "4", "0")
   #<MIDIMessage::NoteOn:0x98c9818 ...>
   
 Interchange the different types
   
-  p nibbler.parse("9", "0", 0x40, 64)
+  nibbler.parse("9", "0", 0x40, 64)
   #<MIDIMessage::NoteOn:0x98c9818 ...>
   
 Use running status
 
-  p nibbler.parse(0x40, 64)
+  nibbler.parse(0x40, 64)
   #<MIDIMessage::NoteOn:0x98c9818 ...>
   
 Look at the messages we've parsed
   
-  p nibbler.messages
+  nibbler.messages
   [#<MIDIMessage::NoteOn:0x98c9804 ...>
    #<MIDIMessage::NoteOn:0x98c9811 ...>]
   
 Add an incomplete message
   
-  p nibbler.parse("9")
-  p nibbler.parse("40")
+  nibbler.parse("9")
+  nibbler.parse("40")
   
 See progress
   
-  p nibbler.buffer
+  nibbler.buffer
   ["9", "4", "0"]
   
-  p nibbler.buffer_s
+  nibbler.buffer_s
   "940"
   
 Pass in a timestamp
 
-  p nibbler.parse("904040", :timestamp => Time.now.to_i)
+  nibbler.parse("904040", :timestamp => Time.now.to_i)
   # { :messages=> #<MIDIMessage::NoteOn:0x92f4564 ..>, :timestamp=>1304488440 }
   
 Bind events
 
   nibbler.when({ :class => MIDIMessage::NoteOn }) { puts "bark" }
-  p nibbler.parse("904040")
+  nibbler.parse("904040")
   
   "bark"
   #<MIDIMessage::NoteOn:0x98c9818 ...>
@@ -105,7 +105,7 @@ Nibbler defaults to generate {midi-message}[http://github.com/arirusso/midi-mess
 
   Nibbler.new(:message_lib => :midilib)
   
-  p nibbler.parse("9", "0", 0x40, "40")
+  nibbler.parse("9", "0", 0x40, "40")
   "0: ch 00 on 40 40"
 
 == Author
