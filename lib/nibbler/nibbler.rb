@@ -53,7 +53,8 @@ module Nibbler
     end
 
     def parse(*a)
-      options = a.last.kind_of?(Hash) ? a.pop : nil
+      a.compact!
+      options = a.last.kind_of?(Hash) ? a.pop : nil      
       timestamp = options[:timestamp] if !options.nil? && !options[:timestamp].nil?
       use_timestamps if !timestamp.nil? && !@timestamps         
       queue = @typefilter.process(a)
