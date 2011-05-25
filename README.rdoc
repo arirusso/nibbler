@@ -107,6 +107,10 @@ Nibbler defaults to generate {midi-message}[http://github.com/arirusso/midi-mess
   
   nibbler.parse("9", "0", 0x40, "40")
   "0: ch 00 on 40 40"
+  
+== Also see
+
+* {midi-eye}[http://github.com/arirusso/midi-eye], a MIDI stream listener based on nibbler
 
 == Author
 
