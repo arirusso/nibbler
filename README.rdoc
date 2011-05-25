@@ -110,7 +110,7 @@ Nibbler defaults to generate {midi-message}[http://github.com/arirusso/midi-mess
   
 == Also see
 
-* {midi-eye}[http://github.com/arirusso/midi-eye], a MIDI stream listener based on nibbler
+* {midi-eye}[http://github.com/arirusso/midi-eye], a MIDI event listener based on nibbler
 
 == Author
 
