@@ -7,8 +7,7 @@ module Nibbler
 
     extend Forwardable
 
-    attr_reader :callbacks,
-                :messages,
+    attr_reader :messages,
                 :processed,
                 :rejected
     
@@ -60,37 +59,13 @@ module Nibbler
       queue = @typefilter.process(a)
       result = @parser.process(queue)
       record_message(result[:messages], timestamp)
-      handle_events(result[:messages]) unless @callbacks.empty?
       @processed += result[:processed]
       @rejected += result[:rejected]
       get_parse_output(result[:messages], options)
-    end
-    
-    def when(hash, &proc)
-      if proc.nil?
-        warn "callback must have proc"
-        return false
-      end
-      hash[:proc] = proc
-      @callbacks << hash
-      true
-    end
-    alias_method :sees, :when
+    end    
     
     private
-    
-    def handle_events(messages)
-      @callbacks.each do |cb|
-        messages.each do |msg|
-          match = true
-          cb.each do |key, val| 
-            match = false if !key.eql?(:proc) && !msg.send(key).eql?(val)
-          end           
-          cb[:proc].call(msg) if match   
-        end
-      end
-    end
-    
+        
     def record_message(msg, timestamp = nil)
       !@timestamps ? @messages += msg : @messages << { 
         :messages => msg, 

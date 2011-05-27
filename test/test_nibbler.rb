@@ -6,49 +6,7 @@ class NibblerTest < Test::Unit::TestCase
 
   include Nibbler
   include TestHelper
-  
-  def test_events
-    nibbler = Nibbler.new
-    testvar = 0
-    nibbler.when({ :class => MIDIMessage::NoteOn }) { testvar += 1 }
-
-    msg = nibbler.parse(0x90, 0x40, 0x40)
-    assert_equal(MIDIMessage::NoteOn, msg.class)
-    assert_equal(0, msg.channel)
-    assert_equal(0x40, msg.note)
-    assert_equal(0x40, msg.velocity)  
-    assert_equal(1, testvar)
-  end
-  
-  def test_2_events
-    nibbler = Nibbler.new
-    testvar = 0
     
-    nibbler.when({ :class => MIDIMessage::NoteOn }) { testvar += 1 }
-    nibbler.when({ :class => MIDIMessage::NoteOff }) { testvar += 1 }
-
-    msg = nibbler.parse(0xA1, 0x40, 0x40)
-    assert_equal(MIDIMessage::PolyphonicAftertouch, msg.class)
-    assert_equal(1, msg.channel)
-    assert_equal(0x40, msg.note)
-    assert_equal(0x40, msg.value)      
-    assert_equal(0, testvar)
-        
-    msg = nibbler.parse(0x90, 0x40, 0x40)
-    assert_equal(MIDIMessage::NoteOn, msg.class)
-    assert_equal(0, msg.channel)
-    assert_equal(0x40, msg.note)
-    assert_equal(0x40, msg.velocity)  
-    assert_equal(1, testvar)
-    
-    msg = nibbler.parse(0x80, 0x40, 0x40)
-    assert_equal(MIDIMessage::NoteOff, msg.class)
-    assert_equal(0, msg.channel)
-    assert_equal(0x40, msg.note)
-    assert_equal(0x40, msg.velocity)  
-    assert_equal(2, testvar)
-  end
-  
   def test_varying_length_strings
     nibbler = Nibbler.new
     msg = nibbler.parse("9", "04", "040")
