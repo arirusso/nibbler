@@ -16,7 +16,7 @@ require 'nibbler/hex_char_array_filter'
 #
 module Nibbler
   
-  VERSION = "0.0.5"
+  VERSION = "0.1.0"
 
   # shortcut to Parser.new
   def self.new(*a, &block)
