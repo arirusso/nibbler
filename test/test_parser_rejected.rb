@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require "test_helper"
+require "helper"
 
 class ParserRejectedTest < Test::Unit::TestCase
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'test_helper'
-
-
+require 'helper'
 
 class MidilibFactoryTest < Test::Unit::TestCase
 
