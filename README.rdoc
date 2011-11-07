@@ -1,6 +1,6 @@
 = nibbler
 
-{cat on arp}[http://images.treetrouble.net/images/dog_with_synth.jpg]
+{cat on arp}[http://img17.imageshack.us/img17/1713/dogwithsynth.jpg]
 
 Parse MIDI Messages
 
