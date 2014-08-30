@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require "helper"
 
 class ParserRejectedTest < Test::Unit::TestCase

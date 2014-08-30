@@ -1,6 +1,4 @@
-#!/usr/bin/env ruby
-
-require 'helper'
+require "helper"
 
 class ParserTest < Test::Unit::TestCase
 
@@ -62,76 +60,76 @@ class ParserTest < Test::Unit::TestCase
   
   def test_process
     parser = Parser.new
-    short = ['9', '0', '4', '0', '5', '0', '5', '0']
+    short = ["9", "0", "4", "0", "5", "0", "5", "0"]
     outp = parser.send(:process, short)
     
     assert_equal(MIDIMessage::NoteOn, outp[:messages].first.class)
-    assert_equal(['5', '0'], parser.buffer)
-    assert_equal(['9', '0', '4', '0', '5', '0'], outp[:processed])
+    assert_equal(["5", "0"], parser.buffer)
+    assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
   end
   
   def test_process_running_status
     parser = Parser.new
-    two_msgs = ['9', '0', '4', '0', '5', '0', "4", "0", "6", "0"]
+    two_msgs = ["9", "0", "4", "0", "5", "0", "4", "0", "6", "0"]
     outp = parser.send(:process, two_msgs)
     
     assert_equal(MIDIMessage::NoteOn, outp[:messages][0].class)
     #assert_equal(MIDIMessage::NoteOn, outp[:messages][1].class)
     assert_equal([], parser.buffer)
-    assert_equal(['9', '0', '4', '0', '5', '0', "4", "0", "6", "0"], outp[:processed])
+    assert_equal(["9", "0", "4", "0", "5", "0", "4", "0", "6", "0"], outp[:processed])
   end
   
   def test_process_multiple_overlapping_calls
     parser = Parser.new
-    short = ['9', '0', '4', '0', '5', '0', '9', '0']
+    short = ["9", "0", "4", "0", "5", "0", "9", "0"]
     short2 = ["3", "0", "2", "0", "1", "0"]
     
     outp = parser.send(:process, short)
     assert_equal(MIDIMessage::NoteOn, outp[:messages].first.class)
-    assert_equal(['9', '0'], parser.buffer)
-    assert_equal(['9', '0', '4', '0', '5', '0'], outp[:processed])
+    assert_equal(["9", "0"], parser.buffer)
+    assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
     
     outp2 = parser.send(:process, short2)
     assert_equal(MIDIMessage::NoteOn, outp2[:messages].first.class)
-    assert_equal(['1', '0'], parser.buffer)
-    assert_equal(['9', '0', '3', '0', '2', '0'], outp2[:processed])    
+    assert_equal(["1", "0"], parser.buffer)
+    assert_equal(["9", "0", "3", "0", "2", "0"], outp2[:processed])    
   end
   
   def test_nibbles_to_message_leading
     parser = Parser.new
-    short = ["5", "0", '9', '0', '4', '0', '5', '0']
+    short = ["5", "0", "9", "0", "4", "0", "5", "0"]
     parser.send(:buffer=, short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
-    assert_equal(["5", "0", '9', '0', '4', '0', '5', '0'], parser.buffer)
+    assert_equal(["5", "0", "9", "0", "4", "0", "5", "0"], parser.buffer)
     assert_equal(nil, outp[:message])
   end
   
   def test_nibbles_to_message_trailing
     parser = Parser.new
-    short = ['9', '0', '4', '0', '5', '0', '5', '0']
+    short = ["9", "0", "4", "0", "5", "0", "5", "0"]
     parser.send(:buffer=, short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
     assert_equal(MIDIMessage::NoteOn, outp[:message].class)
-    assert_equal(['5', '0'], parser.send(:current))
-    assert_equal(['9', '0', '4', '0', '5', '0'], outp[:processed])
+    assert_equal(["5", "0"], parser.send(:current))
+    assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
   end
   
   def test_nibbles_to_message
     parser = Parser.new
-    short = ['9', '0', '4', '0', '5', '0', '5', '0']
+    short = ["9", "0", "4", "0", "5", "0", "5", "0"]
     parser.send(:buffer=, short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
     assert_equal(MIDIMessage::NoteOn, outp[:message].class)
-    assert_equal(['5', '0'], parser.send(:current))
-    assert_equal(['9', '0', '4', '0', '5', '0'], outp[:processed])
+    assert_equal(["5", "0"], parser.send(:current))
+    assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
   end
   
   def test_nibbles_to_message_running_status
     parser = Parser.new
-    short = ['9', '0', '4', '0', '5', '0']
+    short = ["9", "0", "4", "0", "5", "0"]
     parser.send(:buffer=, short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
