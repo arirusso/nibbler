@@ -139,16 +139,7 @@ module Nibbler
       end
       [msg, processed]
     end
-    
-    # for testing
-    def buffer=(val)
-      @buffer=val
-    end
-    
-    def current
-      @current
-    end
-    
+        
   end
 
 end

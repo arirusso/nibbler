@@ -8,54 +8,54 @@ class ParserTest < Test::Unit::TestCase
   def test_lookahead
     parser = Parser.new
     num = 6
-    parser.send(:buffer=, ["9", "0", "4", "0", "5", "0"])
+    parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0"])
     parser.send(:populate_current)    
     outp = parser.send(:lookahead, num) { |nibble_2, bytes| [nibble_2, bytes] }
     assert_equal([0,[0x90, 0x40, 0x50]], outp[0])
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[1])    
-    assert_equal([], parser.send(:current))
+    assert_equal([], parser.instance_variable_get("@current"))
   end
     
   def test_lookahead_trailing
     parser = Parser.new
     num = 6
-    parser.send(:buffer=, ["9", "0", "4", "0", "5", "0", "5", "0"])
+    parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0", "5", "0"])
     parser.send(:populate_current)
     outp = parser.send(:lookahead, num) { |nibble_2, bytes| [nibble_2, bytes] }
     assert_equal([0,[0x90, 0x40, 0x50]], outp[0])
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[1])    
-    assert_equal(["5", "0"], parser.send(:current))
+    assert_equal(["5", "0"], parser.instance_variable_get("@current"))
   end
   
   def test_lookahead_too_short
     parser = Parser.new
     num = 6
-    parser.send(:buffer=, ["9", "0", "4"])
+    parser.instance_variable_set("@buffer", ["9", "0", "4"])
     parser.send(:populate_current)
     outp = parser.send(:lookahead, num) { |nibble_2, bytes| [nibble_2, bytes] }
     assert_equal(nil, outp[0])
     assert_equal([], outp[1])        
-    assert_equal(["9", "0", "4"], parser.send(:current))
+    assert_equal(["9", "0", "4"], parser.instance_variable_get("@current"))
   end
   
   def test_lookahead_sysex
     parser = Parser.new
-    parser.send(:buffer=, "F04110421240007F0041F750".split(//))
+    parser.instance_variable_set("@buffer", "F04110421240007F0041F750".split(//))
     parser.send(:populate_current)
     outp = parser.send(:lookahead_sysex) { |b| b }
     assert_equal([0xF0, 0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7], outp[0])
     assert_equal("F04110421240007F0041F7".split(//), outp[1])    
-    assert_equal(["5", "0"], parser.send(:current))
+    assert_equal(["5", "0"], parser.instance_variable_get("@current"))
   end
   
   def test_lookahead_sysex_too_short
     parser = Parser.new
-    parser.send(:buffer=, ["9", "0", "4"])
+    parser.instance_variable_set("@buffer", ["9", "0", "4"])
     parser.send(:populate_current)
     outp = parser.send(:lookahead_sysex) { |b| b }
     assert_equal(nil, outp[0])
     assert_equal([], outp[1])        
-    assert_equal(["9", "0", "4"], parser.send(:current))
+    assert_equal(["9", "0", "4"], parser.instance_variable_get("@current"))
   end
   
   def test_process
@@ -98,7 +98,7 @@ class ParserTest < Test::Unit::TestCase
   def test_nibbles_to_message_leading
     parser = Parser.new
     short = ["5", "0", "9", "0", "4", "0", "5", "0"]
-    parser.send(:buffer=, short)
+    parser.instance_variable_set("@buffer", short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
     assert_equal(["5", "0", "9", "0", "4", "0", "5", "0"], parser.buffer)
@@ -108,35 +108,35 @@ class ParserTest < Test::Unit::TestCase
   def test_nibbles_to_message_trailing
     parser = Parser.new
     short = ["9", "0", "4", "0", "5", "0", "5", "0"]
-    parser.send(:buffer=, short)
+    parser.instance_variable_set("@buffer", short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
     assert_equal(::MIDIMessage::NoteOn, outp[:message].class)
-    assert_equal(["5", "0"], parser.send(:current))
+    assert_equal(["5", "0"], parser.instance_variable_get("@current"))
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
   end
   
   def test_nibbles_to_message
     parser = Parser.new
     short = ["9", "0", "4", "0", "5", "0", "5", "0"]
-    parser.send(:buffer=, short)
+    parser.instance_variable_set("@buffer", short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
     assert_equal(::MIDIMessage::NoteOn, outp[:message].class)
-    assert_equal(["5", "0"], parser.send(:current))
+    assert_equal(["5", "0"], parser.instance_variable_get("@current"))
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
   end
   
   def test_nibbles_to_message_running_status
     parser = Parser.new
     short = ["9", "0", "4", "0", "5", "0"]
-    parser.send(:buffer=, short)
+    parser.instance_variable_set("@buffer", short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
     assert_equal(::MIDIMessage::NoteOn, outp[:message].class)
     
     running_status = ["5", "0", "6", "0"]
-    parser.send(:buffer=, running_status)
+    parser.instance_variable_set("@buffer", running_status)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
     assert_equal(::MIDIMessage::NoteOn, outp[:message].class)
@@ -146,11 +146,11 @@ class ParserTest < Test::Unit::TestCase
   def test_nibbles_to_message_sysex
     parser = Parser.new
     sysex = "F04110421240007F0041F750".split(//)
-    parser.send(:buffer=, sysex)
+    parser.instance_variable_set("@buffer", sysex)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
     assert_equal(::MIDIMessage::SystemExclusive::Command, outp[:message].class)
-    assert_equal(["5", "0"], parser.send(:current))
+    assert_equal(["5", "0"], parser.instance_variable_get("@current"))
     assert_equal("F04110421240007F0041F7".split(//), outp[:processed])
   end  
                  
