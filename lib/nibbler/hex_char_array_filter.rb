@@ -2,22 +2,24 @@ module Nibbler
   
   # Turns various types of input in to an array of hex digit chars
   class HexCharArrayFilter
+
+    #extend self
        
-    # Returns an array of hex string nibbles
-    def process(*a)
-      a.flatten!
-      buf = []
-      a.each do |thing|
-        buf += case thing
-          when Array then thing.map { |arr| to_nibbles(*arr) }.inject { |a,b| a + b }
-          when String then TypeConversion.hex_str_to_hex_chars(filter_string(thing))
-          when Numeric then TypeConversion.numeric_byte_to_hex_chars(filter_numeric(thing))
-        end
-      end
-      buf.compact.map { |n| n.upcase } 
+    # @params [*String, *Fixnum] args
+    # @return [Array<String>] An array of hex string nibbles eg "6", "a"
+    def process(*args)
+      args.map { |arg| convert(arg) }.flatten.map(&:upcase) 
     end
     
     private
+
+    def convert(value)
+      case value
+        when Array then value.map { |arr| process(*arr) }.inject { |a,b| a + b }
+        when String then TypeConversion.hex_str_to_hex_chars(filter_string(value))
+        when Fixnum then TypeConversion.numeric_byte_to_hex_chars(filter_numeric(value))
+      end
+    end
     
     # Limit the given number to bytes usable in MIDI ie values (0..240)
     # returns nil if the byte is outside of that range
@@ -26,8 +28,8 @@ module Nibbler
     end
     
     # Only return valid hex string characters
-    def filter_string(str)
-      str.gsub(/[^0-9a-fA-F]/, '').upcase
+    def filter_string(string)
+      string.gsub(/[^0-9a-fA-F]/, '').upcase
     end
   
   end
