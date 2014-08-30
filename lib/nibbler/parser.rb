@@ -24,10 +24,10 @@ module Nibbler
         # iterate through nibbles until a status message is found        
         # see if there really is a message there
         populate_current
-        # current is the current piece of the buffer we're dealing with
+        # current is the current piece of the buffer we"re dealing with
         processed = nibbles_to_message
         unless processed[:message].nil?
-          # if it's a real message, reject previous nibbles
+          # if it"s a real message, reject previous nibbles
           output[:rejected] += @buffer.slice(0, @iterator)          
           # and record it          
           @buffer = @current # current now has the remaining nibbles for next pass
@@ -77,13 +77,13 @@ module Nibbler
     def initialize_messager(lib)
       case lib
         when :midilib then    
-          require 'midilib'
-          require 'nibbler/midilib_factory'
-          @messager = MidilibFactory.new
+          require "midilib"
+          require "nibbler/midilib"
+          @messager = ::Nibbler::Midilib
         else    
-          require 'midi-message'    
-          require 'nibbler/midi-message_factory'    
-          @messager = MIDIMessageFactory.new    
+          require "midi-message"    
+          require "nibbler/midi-message"    
+          @messager = ::Nibbler::MIDIMessage    
       end
     end
     

@@ -63,7 +63,7 @@ class ParserTest < Test::Unit::TestCase
     short = ["9", "0", "4", "0", "5", "0", "5", "0"]
     outp = parser.send(:process, short)
     
-    assert_equal(MIDIMessage::NoteOn, outp[:messages].first.class)
+    assert_equal(::MIDIMessage::NoteOn, outp[:messages].first.class)
     assert_equal(["5", "0"], parser.buffer)
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
   end
@@ -73,8 +73,8 @@ class ParserTest < Test::Unit::TestCase
     two_msgs = ["9", "0", "4", "0", "5", "0", "4", "0", "6", "0"]
     outp = parser.send(:process, two_msgs)
     
-    assert_equal(MIDIMessage::NoteOn, outp[:messages][0].class)
-    #assert_equal(MIDIMessage::NoteOn, outp[:messages][1].class)
+    assert_equal(::MIDIMessage::NoteOn, outp[:messages][0].class)
+    #assert_equal(::MIDIMessage::NoteOn, outp[:messages][1].class)
     assert_equal([], parser.buffer)
     assert_equal(["9", "0", "4", "0", "5", "0", "4", "0", "6", "0"], outp[:processed])
   end
@@ -85,12 +85,12 @@ class ParserTest < Test::Unit::TestCase
     short2 = ["3", "0", "2", "0", "1", "0"]
     
     outp = parser.send(:process, short)
-    assert_equal(MIDIMessage::NoteOn, outp[:messages].first.class)
+    assert_equal(::MIDIMessage::NoteOn, outp[:messages].first.class)
     assert_equal(["9", "0"], parser.buffer)
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
     
     outp2 = parser.send(:process, short2)
-    assert_equal(MIDIMessage::NoteOn, outp2[:messages].first.class)
+    assert_equal(::MIDIMessage::NoteOn, outp2[:messages].first.class)
     assert_equal(["1", "0"], parser.buffer)
     assert_equal(["9", "0", "3", "0", "2", "0"], outp2[:processed])    
   end
@@ -111,7 +111,7 @@ class ParserTest < Test::Unit::TestCase
     parser.send(:buffer=, short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
-    assert_equal(MIDIMessage::NoteOn, outp[:message].class)
+    assert_equal(::MIDIMessage::NoteOn, outp[:message].class)
     assert_equal(["5", "0"], parser.send(:current))
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
   end
@@ -122,7 +122,7 @@ class ParserTest < Test::Unit::TestCase
     parser.send(:buffer=, short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
-    assert_equal(MIDIMessage::NoteOn, outp[:message].class)
+    assert_equal(::MIDIMessage::NoteOn, outp[:message].class)
     assert_equal(["5", "0"], parser.send(:current))
     assert_equal(["9", "0", "4", "0", "5", "0"], outp[:processed])
   end
@@ -133,13 +133,13 @@ class ParserTest < Test::Unit::TestCase
     parser.send(:buffer=, short)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
-    assert_equal(MIDIMessage::NoteOn, outp[:message].class)
+    assert_equal(::MIDIMessage::NoteOn, outp[:message].class)
     
     running_status = ["5", "0", "6", "0"]
     parser.send(:buffer=, running_status)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
-    assert_equal(MIDIMessage::NoteOn, outp[:message].class)
+    assert_equal(::MIDIMessage::NoteOn, outp[:message].class)
     assert_equal(["5", "0", "6", "0"], outp[:processed])
   end
   
@@ -149,7 +149,7 @@ class ParserTest < Test::Unit::TestCase
     parser.send(:buffer=, sysex)
     parser.send(:populate_current)
     outp = parser.send(:nibbles_to_message)
-    assert_equal(MIDIMessage::SystemExclusive::Command, outp[:message].class)
+    assert_equal(::MIDIMessage::SystemExclusive::Command, outp[:message].class)
     assert_equal(["5", "0"], parser.send(:current))
     assert_equal("F04110421240007F0041F7".split(//), outp[:processed])
   end  

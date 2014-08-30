@@ -2,7 +2,6 @@ require "helper"
 
 class NibblerTest < Test::Unit::TestCase
 
-  include Nibbler
   include TestHelper
     
   def test_varying_length_strings

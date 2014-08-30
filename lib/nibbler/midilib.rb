@@ -1,9 +1,11 @@
 module Nibbler
 
-  # Factory for constructing messages with midilib
+  # Construct messages with midilib in a generic way
   # https://github.com/jimm/midilib
   # midilib is copyright © 2003-2010 Jim Menard
-  class MidilibFactory
+  module Midilib
+
+    extend self
     
     def note_off(second_nibble, data_byte_1, data_byte_2)
       MIDI::NoteOff.new(second_nibble, data_byte_1, data_byte_2)

@@ -9,8 +9,10 @@ require "forwardable"
 # classes
 require "nibbler/nibbler"
 require "nibbler/parser"
-require "nibbler/type_conversion"
 require "nibbler/hex_char_array_filter"
+
+# helpers
+require "nibbler/type_conversion"
 
 #
 # Parse MIDI Messages
