@@ -1,3 +1,5 @@
+require "midi-message"
+
 module Nibbler
 
   # Construct messages with MIDIMessage in a generic way

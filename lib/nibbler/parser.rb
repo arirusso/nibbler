@@ -77,11 +77,9 @@ module Nibbler
     def initialize_messager(lib)
       case lib
         when :midilib then    
-          require "midilib"
           require "nibbler/midilib"
           @messager = ::Nibbler::Midilib
-        else    
-          require "midi-message"    
+        else      
           require "nibbler/midi-message"    
           @messager = ::Nibbler::MIDIMessage    
       end

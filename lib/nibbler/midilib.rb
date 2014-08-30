@@ -1,3 +1,5 @@
+require "midilib"
+
 module Nibbler
 
   # Construct messages with midilib in a generic way
