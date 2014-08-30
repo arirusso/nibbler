@@ -9,16 +9,7 @@ module Nibbler
       @buffer = []
       @iterator = 0
       
-      case options[:message_lib]
-        when :midilib then    
-          require 'midilib'
-          require 'nibbler/midilib_factory'
-          @message_factory = MidilibFactory.new
-        else    
-          require 'midi-message'    
-          require 'nibbler/midi-message_factory'    
-          @message_factory = MIDIMessageFactory.new    
-      end 
+      initialize_messager(options[:message_lib])
     end
 
     def process(nibbles)
@@ -63,17 +54,17 @@ module Nibbler
       second = @current[1].hex
       
       output[:message], output[:processed] = *case first
-        when 0x8 then lookahead(6) { |status_2, bytes| @message_factory.note_off(status_2, bytes[1], bytes[2]) }
-        when 0x9 then lookahead(6) { |status_2, bytes| @message_factory.note_on(status_2, bytes[1], bytes[2]) }
-        when 0xA then lookahead(6) { |status_2, bytes| @message_factory.polyphonic_aftertouch(status_2, bytes[1], bytes[2]) }
-        when 0xB then lookahead(6) { |status_2, bytes| @message_factory.control_change(status_2, bytes[1], bytes[2]) }
-        when 0xC then lookahead(4) { |status_2, bytes| @message_factory.program_change(status_2, bytes[1]) }
-        when 0xD then lookahead(4) { |status_2, bytes| @message_factory.channel_aftertouch(status_2, bytes[1]) }
-        when 0xE then lookahead(6) { |status_2, bytes| @message_factory.pitch_bend(status_2, bytes[1], bytes[2]) }
+        when 0x8 then lookahead(6) { |status_2, bytes| @messager.note_off(status_2, bytes[1], bytes[2]) }
+        when 0x9 then lookahead(6) { |status_2, bytes| @messager.note_on(status_2, bytes[1], bytes[2]) }
+        when 0xA then lookahead(6) { |status_2, bytes| @messager.polyphonic_aftertouch(status_2, bytes[1], bytes[2]) }
+        when 0xB then lookahead(6) { |status_2, bytes| @messager.control_change(status_2, bytes[1], bytes[2]) }
+        when 0xC then lookahead(4) { |status_2, bytes| @messager.program_change(status_2, bytes[1]) }
+        when 0xD then lookahead(4) { |status_2, bytes| @messager.channel_aftertouch(status_2, bytes[1]) }
+        when 0xE then lookahead(6) { |status_2, bytes| @messager.pitch_bend(status_2, bytes[1], bytes[2]) }
         when 0xF then case second
-          when 0x0 then lookahead_sysex { |bytes| @message_factory.system_exclusive(*bytes) }
-          when 0x1..0x6 then lookahead(6, :recursive => true) { |status_2, bytes| @message_factory.system_common(status_2, bytes[1], bytes[2]) }
-          when 0x8..0xF then lookahead(2) { |status_2, bytes| @message_factory.system_realtime(status_2) }
+          when 0x0 then lookahead_sysex { |bytes| @messager.system_exclusive(*bytes) }
+          when 0x1..0x6 then lookahead(6, :recursive => true) { |status_2, bytes| @messager.system_common(status_2, bytes[1], bytes[2]) }
+          when 0x8..0xF then lookahead(2) { |status_2, bytes| @messager.system_realtime(status_2) }
         end
         else
           use_running_status if running_status_possible?            
@@ -82,6 +73,19 @@ module Nibbler
     end
     
     private
+
+    def initialize_messager(lib)
+      case lib
+        when :midilib then    
+          require 'midilib'
+          require 'nibbler/midilib_factory'
+          @messager = MidilibFactory.new
+        else    
+          require 'midi-message'    
+          require 'nibbler/midi-message_factory'    
+          @messager = MIDIMessageFactory.new    
+      end
+    end
     
     def running_status_possible?
       !@running_status.nil?
