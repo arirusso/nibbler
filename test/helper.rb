@@ -3,7 +3,3 @@ $LOAD_PATH.unshift dir + "/../lib"
 
 require "test/unit"
 require "nibbler"
-
-module TestHelper
-  
-end
