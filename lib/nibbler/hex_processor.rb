@@ -1,14 +1,17 @@
 module Nibbler  
   
-  # Turns various types of input in to an array of hex digit chars
-  class HexCharArrayFilter
+  # Accepts various types of input and returns an array of hex digit chars
+  module HexProcessor
 
-    #extend self
+    extend self
        
+    # Accepts various types of input and returns an array of hex digit chars
+    # Invalid input is disregarded
+    #
     # @param [*String, *Fixnum] args
     # @return [Array<String>] An array of hex string nibbles eg "6", "a"
     def process(*args)
-      args.map { |arg| convert(arg) }.flatten.map(&:upcase) 
+      args.map { |arg| convert(arg) }.flatten.compact.map(&:upcase) 
     end
     
     private

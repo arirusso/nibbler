@@ -19,12 +19,10 @@ module Nibbler
     def_delegator :clear_rejected, :rejected, :clear
     def_delegator :clear_messages, :messages, :clear
 
-    def initialize(options = {}, &block)
+    def initialize(options = {})
       @timestamps = options[:timestamps] || false
       @callbacks, @processed, @rejected, @messages = [], [], [], []
       @parser = Parser.new(options)    
-      @typefilter = HexCharArrayFilter.new
-      block.call unless block.nil?
     end
     
     def all_messages
@@ -44,21 +42,27 @@ module Nibbler
       @messages.clear
     end
     
+    # Convert messages to hashes with timestamps
     def use_timestamps
-      @messages = @messages.map do |m|
-        { :messages => m, :timestamp => nil }
+      @messages = @messages.map do |message|
+        { 
+          :messages => message, 
+          :timestamp => nil
+        }
       end
       @timestamps = true
     end
 
-    def parse(*a)
-      a.compact!
-      options = a.last.kind_of?(Hash) ? a.pop : nil      
+    def parse(*args)
+      args.compact!
+      options = args.pop if args.last.kind_of?(Hash) 
+
       timestamp = options[:timestamp] if !options.nil? && !options[:timestamp].nil?
-      use_timestamps if !timestamp.nil? && !@timestamps         
-      queue = @typefilter.process(a)
+      use_timestamps if !timestamp.nil? && !@timestamps 
+
+      queue = HexProcessor.process(args)
       result = @parser.process(queue)
-      record_message(result[:messages], timestamp)
+      report_message(result[:messages], :timestamp => timestamp)
       @processed += result[:processed]
       @rejected += result[:rejected]
       get_parse_output(result[:messages], options)
@@ -66,11 +70,15 @@ module Nibbler
     
     private
         
-    def record_message(msg, timestamp = nil)
-      !@timestamps ? @messages += msg : @messages << { 
-        :messages => msg, 
-        :timestamp => timestamp 
-      }     
+    def report_message(message, options = {})
+      if @timestamps
+        @messages << { 
+          :messages => message, 
+          :timestamp => options[:timestamp] 
+        }     
+      else
+        @messages += message
+      end
     end
     
     def get_parse_output(messages, options = nil)

@@ -6,13 +6,13 @@
 # libs
 require "forwardable"
 
+# modules
+require "nibbler/hex_processor"
+require "nibbler/type_conversion"
+
 # classes
 require "nibbler/parser"
 require "nibbler/session"
-require "nibbler/hex_char_array_filter"
-
-# helpers
-require "nibbler/type_conversion"
 
 #
 # Parse MIDI Messages
