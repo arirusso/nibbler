@@ -36,9 +36,7 @@ class Nibbler::ParserTest < Test::Unit::TestCase
       }
     end
 
-    assert_not_nil output
-    assert_nil output[:message]
-    assert_equal([], output[:processed])        
+    assert_nil output      
     assert_equal(["9", "0", "4"], parser.instance_variable_get("@current"))
   end
   
@@ -57,8 +55,8 @@ class Nibbler::ParserTest < Test::Unit::TestCase
     parser.instance_variable_set("@buffer", ["9", "0", "4"])
     parser.send(:populate_current)
     output = parser.send(:lookahead_sysex) { |b| b }
-    assert_equal(nil, output[:message])
-    assert_equal([], output[:processed])        
+    
+    assert_nil output     
     assert_equal(["9", "0", "4"], parser.instance_variable_get("@current"))
   end
   
@@ -77,6 +75,7 @@ class Nibbler::ParserTest < Test::Unit::TestCase
     two_msgs = ["9", "0", "4", "0", "5", "0", "4", "0", "6", "0"]
     output = parser.send(:process, two_msgs)
     
+    assert_not_nil output
     assert_equal(::MIDIMessage::NoteOn, output[:messages][0].class)
     #assert_equal(::MIDIMessage::NoteOn, output[:messages][1].class)
     assert_equal([], parser.buffer)
@@ -89,11 +88,15 @@ class Nibbler::ParserTest < Test::Unit::TestCase
     short2 = ["3", "0", "2", "0", "1", "0"]
     
     output = parser.send(:process, short)
+
+    assert_not_nil output
     assert_equal(::MIDIMessage::NoteOn, output[:messages].first.class)
     assert_equal(["9", "0"], parser.buffer)
     assert_equal(["9", "0", "4", "0", "5", "0"], output[:processed])
     
     output2 = parser.send(:process, short2)
+
+    assert_not_nil output2
     assert_equal(::MIDIMessage::NoteOn, output2[:messages].first.class)
     assert_equal(["1", "0"], parser.buffer)
     assert_equal(["9", "0", "3", "0", "2", "0"], output2[:processed])    
@@ -106,9 +109,8 @@ class Nibbler::ParserTest < Test::Unit::TestCase
     parser.send(:populate_current)
     output = parser.send(:nibbles_to_message)
 
-    assert_not_nil output
+    assert_nil output
     assert_equal(["5", "0", "9", "0", "4", "0", "5", "0"], parser.buffer)
-    assert_nil output[:message]
   end
   
   def test_nibbles_to_message_trailing
