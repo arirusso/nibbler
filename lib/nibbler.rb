@@ -7,8 +7,8 @@
 require "forwardable"
 
 # classes
-require "nibbler/nibbler"
 require "nibbler/parser"
+require "nibbler/session"
 require "nibbler/hex_char_array_filter"
 
 # helpers
@@ -21,9 +21,9 @@ module Nibbler
   
   VERSION = "0.1.1"
 
-  # Shortcut to Parser.new
+  # Shortcut to a new parser session
   def self.new(*a, &block)
-    Nibbler.new(*a, &block)
+    Session.new(*a, &block)
   end
 
 end

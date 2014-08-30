@@ -133,8 +133,7 @@ module Nibbler
       @running_status = nil
 
       bytes = TypeConversion.hex_chars_to_numeric_bytes(@current)
-      index = bytes.index(0xF7)
-      unless index.nil?
+      unless (index = bytes.index(0xF7)).nil?
         {
           :message => yield(bytes.slice!(0, index + 1)),
           :processed => @current.slice!(0, (index + 1) * 2)

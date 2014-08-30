@@ -1,7 +1,11 @@
 module Nibbler
  
-  # The parser API
-  class Nibbler
+  # A parser session
+  #
+  # Holds on to data that is not relevant to the parser between calls. For instance,
+  # past messages, rejected bytes
+  #
+  class Session
 
     extend Forwardable
 
@@ -9,8 +13,6 @@ module Nibbler
                 :processed,
                 :rejected
     
-    # this class holds on to all output except for the buffer because the data in the buffer
-    # is the only data that's relevant between calls of Parser.process 
     def_delegators :@parser, :buffer            
     def_delegator :clear_buffer, :buffer, :clear
     def_delegator :clear_processed, :processed, :clear
