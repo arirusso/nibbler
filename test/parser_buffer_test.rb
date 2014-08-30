@@ -1,9 +1,6 @@
 require "helper"
 
-class BufferTest < Test::Unit::TestCase
-
-  include Nibbler
-  include TestHelper
+class Nibbler::BufferTest < Test::Unit::TestCase
 
   def test_buffer_nibble_str
     nibbler = Nibbler.new

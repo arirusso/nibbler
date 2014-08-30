@@ -1,9 +1,6 @@
 require "helper"
 
-class ParserRejectedTest < Test::Unit::TestCase
-
-  include Nibbler
-  include TestHelper
+class Nibbler::ParserRejectedTest < Test::Unit::TestCase
   
   def test_leading_chars
     nibbler = Nibbler.new

@@ -1,9 +1,8 @@
 require "helper"
+require "nibbler/midi-message"
 
-class MIDIMessageTest < Test::Unit::TestCase
+class Nibbler::MIDIMessageTest < Test::Unit::TestCase
 
-  include TestHelper
- 
   def test_note_off
     lib = Nibbler::MIDIMessage
     message = lib.note_off(0, 0x40, 0x40)

@@ -1,9 +1,7 @@
 require "helper"
 require "nibbler/midilib"
 
-class MidilibTest < Test::Unit::TestCase
-
-  include TestHelper
+class Nibbler::MidilibTest < Test::Unit::TestCase
    
   def test_note_off
     lib = Nibbler::Midilib

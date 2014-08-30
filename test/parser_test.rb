@@ -1,12 +1,9 @@
 require "helper"
 
-class ParserTest < Test::Unit::TestCase
-
-  include Nibbler
-  include TestHelper
+class Nibbler::ParserTest < Test::Unit::TestCase
   
   def test_lookahead
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     num = 6
     parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0"])
     parser.send(:populate_current)    
@@ -17,7 +14,7 @@ class ParserTest < Test::Unit::TestCase
   end
     
   def test_lookahead_trailing
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     num = 6
     parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0", "5", "0"])
     parser.send(:populate_current)
@@ -28,7 +25,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_lookahead_too_short
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     num = 6
     parser.instance_variable_set("@buffer", ["9", "0", "4"])
     parser.send(:populate_current)
@@ -39,7 +36,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_lookahead_sysex
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     parser.instance_variable_set("@buffer", "F04110421240007F0041F750".split(//))
     parser.send(:populate_current)
     outp = parser.send(:lookahead_sysex) { |b| b }
@@ -49,7 +46,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_lookahead_sysex_too_short
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     parser.instance_variable_set("@buffer", ["9", "0", "4"])
     parser.send(:populate_current)
     outp = parser.send(:lookahead_sysex) { |b| b }
@@ -59,7 +56,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_process
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     short = ["9", "0", "4", "0", "5", "0", "5", "0"]
     outp = parser.send(:process, short)
     
@@ -69,7 +66,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_process_running_status
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     two_msgs = ["9", "0", "4", "0", "5", "0", "4", "0", "6", "0"]
     outp = parser.send(:process, two_msgs)
     
@@ -80,7 +77,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_process_multiple_overlapping_calls
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     short = ["9", "0", "4", "0", "5", "0", "9", "0"]
     short2 = ["3", "0", "2", "0", "1", "0"]
     
@@ -96,7 +93,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_nibbles_to_message_leading
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     short = ["5", "0", "9", "0", "4", "0", "5", "0"]
     parser.instance_variable_set("@buffer", short)
     parser.send(:populate_current)
@@ -106,7 +103,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_nibbles_to_message_trailing
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     short = ["9", "0", "4", "0", "5", "0", "5", "0"]
     parser.instance_variable_set("@buffer", short)
     parser.send(:populate_current)
@@ -117,7 +114,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_nibbles_to_message
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     short = ["9", "0", "4", "0", "5", "0", "5", "0"]
     parser.instance_variable_set("@buffer", short)
     parser.send(:populate_current)
@@ -128,7 +125,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_nibbles_to_message_running_status
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     short = ["9", "0", "4", "0", "5", "0"]
     parser.instance_variable_set("@buffer", short)
     parser.send(:populate_current)
@@ -144,7 +141,7 @@ class ParserTest < Test::Unit::TestCase
   end
   
   def test_nibbles_to_message_sysex
-    parser = Parser.new
+    parser = Nibbler::Parser.new
     sysex = "F04110421240007F0041F750".split(//)
     parser.instance_variable_set("@buffer", sysex)
     parser.send(:populate_current)
@@ -153,5 +150,11 @@ class ParserTest < Test::Unit::TestCase
     assert_equal(["5", "0"], parser.instance_variable_get("@current"))
     assert_equal("F04110421240007F0041F7".split(//), outp[:processed])
   end  
-                 
+  
+  def test_use_midilib
+    assert_nothing_raised Exception do
+      Nibbler::Parser.new(:message_lib => :midilib)
+    end
+  end
+            
 end
