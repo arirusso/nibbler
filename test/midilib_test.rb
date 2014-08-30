@@ -120,13 +120,13 @@ class MidilibTest < Test::Unit::TestCase
     assert_equal(MIDI::Stop, message.class)
   end    
   
-  def test_stop
+  def test_sense
     lib = Midilib
     message = lib.system_realtime(0xE)
     assert_equal(MIDI::ActiveSense, message.class)
   end       
 
-  def test_stop
+  def test_reset
     lib = Midilib
     message = lib.system_realtime(0xF)
     assert_equal(MIDI::SystemReset, message.class)
