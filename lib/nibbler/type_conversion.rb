@@ -1,8 +1,6 @@
-#!/usr/bin/env ruby
-#
 module Nibbler
  
-  # this is a helper for converting nibbles and bytes
+  # This is a helper for converting nibbles and bytes
   module TypeConversion
     
     def self.hex_chars_to_numeric_bytes(nibbles)

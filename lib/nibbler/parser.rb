@@ -1,9 +1,5 @@
-#!/usr/bin/env ruby
-#
 module Nibbler
  
-
-  # this is where messages go
   class Parser
     
     attr_reader :buffer

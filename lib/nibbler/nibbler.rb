@@ -1,8 +1,6 @@
-#!/usr/bin/env ruby
-#
 module Nibbler
  
-  # this is the entry point to the app
+  # The parser API
   class Nibbler
 
     extend Forwardable

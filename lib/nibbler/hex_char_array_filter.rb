@@ -1,11 +1,9 @@
-#!/usr/bin/env ruby
-#
 module Nibbler  
   
   # Turns various types of input in to an array of hex digit chars
   class HexCharArrayFilter
        
-    # returns an array of hex string nibbles
+    # Returns an array of hex string nibbles
     def process(*a)
       a.flatten!
       buf = []
@@ -21,13 +19,13 @@ module Nibbler
     
     private
     
-    # limit <em>num</em> to bytes usable in MIDI ie values (0..240)
+    # Limit the given number to bytes usable in MIDI ie values (0..240)
     # returns nil if the byte is outside of that range
     def filter_numeric(num)
       (0x00..0xFF).include?(num) ? num : nil
     end
     
-    # get rid of non-hex string characters
+    # Only return valid hex string characters
     def filter_string(str)
       str.gsub(/[^0-9a-fA-F]/, '').upcase
     end
