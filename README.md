@@ -4,7 +4,7 @@
 
 Parse MIDI Messages
 	
-== Install
+## Install
 
 `gem install midi-nibbler`
 
@@ -124,15 +124,15 @@ nibbler.parse("9", "0", 0x40, "40")
   => "0: ch 00 on 40 40"
 ```
 
-== Also see
+## Also see
 
 * [midi-eye](http://github.com/arirusso/midi-eye), a MIDI event listener based on nibbler
 
-== Author
+## Author
 
 * [Ari Russo](http://github.com/arirusso) <ari.russo at gmail.com>
 
-== License
+## License
 
 Apache 2.0, See the file LICENSE
 
