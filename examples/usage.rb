@@ -4,12 +4,10 @@
 #
 
 dir = File.dirname(File.expand_path(__FILE__))
-$LOAD_PATH.unshift dir + '/../lib'
+$LOAD_PATH.unshift dir + "/../lib"
 
-require 'nibbler'
-require 'pp'
-
-
+require "nibbler"
+require "pp"
 
 nibbler = Nibbler.new
 
@@ -41,7 +39,7 @@ pp "Use running status"
 
 pp nibbler.parse(0x40, 64)
   
-pp "Look at the messages we've parsed"
+pp "Look at the messages we"ve parsed"
 
 pp nibbler.messages # this should return an array of messages
 
@@ -71,7 +69,7 @@ pp "Add callbacks"
 # you can list any properties of the message to check against. 
 # if they are all true, the callback will fire
 #
-# if you wish to use "or" or any more advanced matching I would just process the message after it's
+# if you wish to use "or" or any more advanced matching I would just process the message after it"s
 # returned
 #
 nibbler.when({ :class => MIDIMessage::NoteOn }) { |msg| puts "bark" } 
