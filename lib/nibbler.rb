@@ -19,7 +19,7 @@ require "nibbler/session"
 #
 module Nibbler
 
-  VERSION = "0.2.2"
+  VERSION = "0.2.3"
 
   # Shortcut to a new parser session
   def self.new(*a, &block)
