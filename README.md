@@ -3,7 +3,7 @@
 ![nibbler](http://img17.imageshack.us/img17/1713/dogwithsynth.jpg)
 
 Parse MIDI Messages
-	
+
 ## Install
 
 `gem install midi-nibbler`
@@ -16,12 +16,12 @@ or using Bundler, add this to your Gemfile
 
 ```ruby
 require 'nibbler'
-  
+
 nibbler = Nibbler.new
 ```
 
 Enter a message piece by piece
-  
+
 ```ruby
 nibbler.parse("90")
   => nil
@@ -30,31 +30,31 @@ nibbler.parse("40")
   => nil
 
 nibbler.parse("40")
-  => #<MIDIMessage::NoteOn:0x98c9818 
-       @channel=0, 
-       @data=[64, 100], 
-       @name="C3", 
-       @note=64, 
-       @status=[9, 0], 
-       @velocity=100, 
+  => #<MIDIMessage::NoteOn:0x98c9818
+       @channel=0,
+       @data=[64, 100],
+       @name="C3",
+       @note=64,
+       @status=[9, 0],
+       @velocity=100,
        @verbose_name="Note On: C3">
 ```
-  
+
 Enter a message all at once
-  
+
 ```ruby
 nibbler.parse("904040")
-  
-  => #<MIDIMessage::NoteOn:0x98c9818 
-        @channel=0, 
-        @data=[64, 100], 
-        @name="C3", 
-        @note=64, 
-        @status=[9, 0], 
-        @velocity=100, 
+
+  => #<MIDIMessage::NoteOn:0x98c9818
+        @channel=0,
+        @data=[64, 100],
+        @name="C3",
+        @note=64,
+        @status=[9, 0],
+        @velocity=100,
         @verbose_name="Note On: C3">
 ```
- 
+
 Use bytes
 
 ```ruby
@@ -63,14 +63,14 @@ nibbler.parse(0x90, 0x40, 0x40)
 ```
 
 You can use nibbles in string format
- 
+
 ```ruby
 nibbler.parse("9", "0", "4", "0", "4", "0")
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
 ```
 
 Interchange the different types
-  
+
 ```ruby
 nibbler.parse("9", "0", 0x40, 64)
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
@@ -84,7 +84,7 @@ nibbler.parse(0x40, 64)
 ```
 
 Look at the messages we've parsed
-  
+
 ```ruby
 nibbler.messages
   => [#<MIDIMessage::NoteOn:0x98c9804 ...>
@@ -92,7 +92,7 @@ nibbler.messages
 ```
 
 Add an incomplete message
-  
+
 ```ruby
 nibbler.parse("9")
 nibbler.parse("40")
@@ -107,7 +107,7 @@ nibbler.buffer
 nibbler.buffer_s
   => "940"
 ```
-  
+
 Pass in a timestamp
 
 ```ruby
@@ -119,7 +119,7 @@ Nibbler defaults to generate [midi-message](http://github.com/arirusso/midi-mess
 
 ```ruby
 Nibbler.new(:message_lib => :midilib)
-  
+
 nibbler.parse("9", "0", 0x40, "40")
   => "0: ch 00 on 40 40"
 ```
@@ -136,4 +136,4 @@ nibbler.parse("9", "0", 0x40, "40")
 
 Apache 2.0, See the file LICENSE
 
-Copyright (c) 2011-2014 Ari Russo
+Copyright (c) 2011-2015 Ari Russo
