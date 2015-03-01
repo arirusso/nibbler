@@ -6,6 +6,7 @@ module Nibbler
     extend self
 
     # Converts an array of hex nibble strings to numeric bytes
+    # eg ["9", "0", "5", "0", "4", "0"] => [0x90, 0x50, 0x40]
     # @param [Array<String>] nibbles
     # @return [Array<Fixnum>]
     def hex_chars_to_numeric_bytes(nibbles)
@@ -22,13 +23,14 @@ module Nibbler
     end
 
     # Converts a string of hex digits to string nibbles
+    # eg "905040" => ["9", "0", "5", "0", "4", "0"]
     # @param [String] string
     # @return [Array<String>]
     def hex_str_to_hex_chars(string)
       string.split(//)
     end
 
-    # Converts a numeric byte to an array of hex nibble strings
+    # Converts a numeric byte to an array of hex nibble strings eg 0x90 => ["9", "0"]
     # @param [Fixnum] num
     # @return [Array<String>]
     def numeric_byte_to_hex_chars(num)
