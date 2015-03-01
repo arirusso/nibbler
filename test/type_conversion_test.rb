@@ -18,6 +18,30 @@ class Nibbler::TypeConversionTest < Minitest::Test
     assert_equal(["9", "0", "4", "0", "5", "0"], nibbles)
   end
 
+  def test_hex_str_to_numeric_bytes
+    str = "904050"
+    bytes = Nibbler::TypeConversion.send(:hex_str_to_numeric_bytes, str)
+
+    assert_equal("904050", str)
+    assert_equal([0x90, 0x40, 0x50], bytes)
+  end
+
+  def test_numeric_bytes_to_numeric_nibbles
+    bytes = [0x90, 0x40, 0x50]
+    nibbles = Nibbler::TypeConversion.send(:numeric_bytes_to_numeric_nibbles, bytes)
+
+    assert_equal([0x90, 0x40, 0x50], bytes)
+    assert_equal([0x9, 0x0, 0x4, 0x0, 0x5, 0x0], nibbles)
+  end
+
+  def test_hex_str_to_numeric_nibbles
+    str = "904050"
+    nibbles = Nibbler::TypeConversion.send(:hex_str_to_numeric_nibbles, str)
+
+    assert_equal("904050", str)
+    assert_equal([0x9, 0x0, 0x4, 0x0, 0x5, 0x0], nibbles)
+  end
+
   def test_numeric_byte_to_numeric_nibbles
     num = 0x90
     nibbles = Nibbler::TypeConversion.send(:numeric_byte_to_numeric_nibbles, num)
