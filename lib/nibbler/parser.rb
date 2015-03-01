@@ -93,6 +93,7 @@ module Nibbler
       end
     end
 
+    # Is running status active?
     # @return [Boolean]
     def possible_running_status?
       !@running_status.nil?
@@ -102,6 +103,9 @@ module Nibbler
       lookahead(@running_status[:num], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:callback])
     end
 
+    # Get the data in the buffer for the given pointer
+    # @param [Fixnum] pointer
+    # @return [Array<String>]
     def get_fragment(pointer)
       @buffer[pointer, (@buffer.length - pointer)]
     end
