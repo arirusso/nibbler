@@ -8,7 +8,7 @@
 require "forwardable"
 
 # modules
-require "nibbler/hex_processor"
+require "nibbler/data_processor"
 require "nibbler/type_conversion"
 
 # classes

@@ -1,11 +1,11 @@
 require "helper"
 
-class Nibbler::HexProcessorTest < Minitest::Test
+class Nibbler::DataProcessorTest < Minitest::Test
 
-  context "HexProcessor" do
+  context "DataProcessor" do
 
     setup do
-      @processor = Nibbler::HexProcessor
+      @processor = Nibbler::DataProcessor
     end
 
     context "#process" do
