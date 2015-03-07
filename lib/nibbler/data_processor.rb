@@ -1,6 +1,12 @@
 module Nibbler
 
   # Accepts various types of input and returns an array of hex digit chars
+  #
+  # Ideally this would output Fixnum objects. However, given that Ruby numerics 0x0 and 0x00 result in the same
+  # object (0 Fixnum), this would limit the parser to only working with bytes instead of both nibbles and bytes.
+  #
+  # For example, if the input were "5" then the processor would return an ambiguous 0x5
+  #
   module DataProcessor
 
     extend self
