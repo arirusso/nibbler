@@ -101,7 +101,7 @@ module Nibbler
     end
 
     def use_running_status(fragment)
-      lookahead(@running_status[:num], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:message_builder])
+      lookahead(@running_status[:num_nibbles], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:message_builder])
     end
 
     # Get the data in the buffer for the given pointer
@@ -111,11 +111,10 @@ module Nibbler
       @buffer[pointer, (@buffer.length - pointer)]
     end
 
-    def lookahead(num, fragment, options = {}, &message_builder)
-      # do we have enough nibbles for num bytes?
-      if fragment.size >= num
+    def lookahead(num_nibbles, fragment, options = {}, &message_builder)
+      if fragment.size >= num_nibbles
         # if so shift those nibbles off of the array and call block with them
-        nibbles = fragment.slice!(0, num)
+        nibbles = fragment.slice!(0, num_nibbles)
         status_nibble ||= options[:status_nibble] || nibbles[1]
 
         # send the nibbles to the block as bytes
@@ -125,7 +124,7 @@ module Nibbler
         # record the fragment situation in case running status comes up next round
         @running_status = {
           :message_builder => message_builder,
-          :num => num - 2,
+          :num_nibbles => num_nibbles - 2,
           :status_nibble => status_nibble
         }
         result = yield(status_nibble.hex, bytes)
@@ -133,8 +132,8 @@ module Nibbler
           :message => result,
           :processed => nibbles
         }
-      elsif num > 0 && !!options[:recursive]
-        lookahead(num - 2, fragment, options, &message_builder)
+      elsif num_nibbles > 0 && !!options[:recursive]
+        lookahead(num_nibbles - 2, fragment, options, &message_builder)
       end
     end
 
