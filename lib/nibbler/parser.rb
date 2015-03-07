@@ -49,6 +49,7 @@ module Nibbler
     # @return [Hash, nil]
     def nibbles_to_message(fragment)
       if fragment.length >= 2
+        # convert the part of the fragment to start with to a numeric
         slice = fragment.slice(0..1).map(&:hex)
         compute_message(slice, fragment)
       end
@@ -100,7 +101,7 @@ module Nibbler
     end
 
     def use_running_status(fragment)
-      lookahead(@running_status[:num], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:callback])
+      lookahead(@running_status[:num], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:message_builder])
     end
 
     # Get the data in the buffer for the given pointer
@@ -110,7 +111,7 @@ module Nibbler
       @buffer[pointer, (@buffer.length - pointer)]
     end
 
-    def lookahead(num, fragment, options = {}, &callback)
+    def lookahead(num, fragment, options = {}, &message_builder)
       # do we have enough nibbles for num bytes?
       if fragment.size >= num
         # if so shift those nibbles off of the array and call block with them
@@ -123,27 +124,29 @@ module Nibbler
 
         # record the fragment situation in case running status comes up next round
         @running_status = {
-          :callback => callback,
+          :message_builder => message_builder,
           :num => num - 2,
           :status_nibble => status_nibble
         }
-
+        result = yield(status_nibble.hex, bytes)
         {
-          :message => yield(status_nibble.hex, bytes),
+          :message => result,
           :processed => nibbles
         }
       elsif num > 0 && !!options[:recursive]
-        lookahead(num - 2, fragment, options, &callback)
+        lookahead(num - 2, fragment, options, &message_builder)
       end
     end
 
-    def lookahead_sysex(fragment, &block)
+    def lookahead_sysex(fragment, &message_builder)
       @running_status = nil
 
       bytes = TypeConversion.hex_chars_to_numeric_bytes(fragment)
       unless (index = bytes.index(0xF7)).nil?
+        message_data = bytes.slice!(0, index + 1)
+        result = yield(message_data)
         {
-          :message => yield(bytes.slice!(0, index + 1)),
+          :message => result,
           :processed => fragment.slice!(0, (index + 1) * 2)
         }
       end
