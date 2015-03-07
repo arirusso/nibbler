@@ -15,7 +15,7 @@ module Nibbler
       # it will be processed later anyway
       nibbles.slice!(nibbles.length-2, 1) if nibbles.length.odd?
       bytes = []
-      while !(nibs = nibbles.slice!(0,2)).empty?
+      until (nibs = nibbles.slice!(0,2)).empty?
         byte = (nibs[0].hex << 4) + nibs[1].hex
         bytes << byte
       end
