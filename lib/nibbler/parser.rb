@@ -46,6 +46,8 @@ module Nibbler
       report
     end
 
+    # If possible, convert the given fragment to a MIDI message
+    # @param [Array<String>] fragment A fragment of data eg ["9", "0", "4", "0", "5", "0"]
     # @return [Hash, nil]
     def nibbles_to_message(fragment)
       if fragment.length >= 2
@@ -94,12 +96,15 @@ module Nibbler
       end
     end
 
-    # Is running status active?
+    # Is there an active cached running status?
     # @return [Boolean]
     def possible_running_status?
       !@running_status.nil?
     end
 
+    # Attempt to convert the fragment to a MIDI message using the given fragment and cached running status
+    # @param [Array<String>] fragment A fragment of data eg ["4", "0", "5", "0"]
+    # @return [Hash, nil]
     def use_running_status(fragment)
       lookahead(@running_status[:num_nibbles], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:message_builder])
     end
