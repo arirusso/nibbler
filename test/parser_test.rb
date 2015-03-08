@@ -41,8 +41,8 @@ class Nibbler::ParserTest < Minitest::Test
     parser = Nibbler::Parser.new
     parser.instance_variable_set("@buffer", "F04110421240007F0041F750".split(//))
     fragment = parser.send(:get_fragment, 0)
-    output = parser.send(:lookahead_sysex, fragment) { |b| b }
-    assert_equal([0xF0, 0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7], output[:message])
+    output = parser.send(:lookahead_sysex, fragment)
+    assert_equal([0xF0, 0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7], output[:message].to_a.flatten)
     assert_equal("F04110421240007F0041F7".split(//), output[:processed])
   end
 
@@ -50,7 +50,7 @@ class Nibbler::ParserTest < Minitest::Test
     parser = Nibbler::Parser.new
     parser.instance_variable_set("@buffer", ["9", "0", "4"])
     fragment = parser.send(:get_fragment, 0)
-    output = parser.send(:lookahead_sysex, fragment) { |b| b }
+    output = parser.send(:lookahead_sysex, fragment)
 
     assert_nil output
   end
