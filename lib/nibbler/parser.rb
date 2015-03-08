@@ -116,6 +116,15 @@ module Nibbler
       @buffer[pointer, (@buffer.length - pointer)]
     end
 
+    # If the given fragment has at least the given number of nibbles, use it to build a hash that can be used
+    # to build a MIDI message
+    #
+    # @param [Fixnum] num_nibbles
+    # @param [Array<String>] fragment
+    # @param [Hash] options
+    # @option options [String] :status_nibble
+    # @option options [Boolean] :recursive
+    # @return [Hash, nil]
     def lookahead(num_nibbles, fragment, options = {}, &message_builder)
       if fragment.size >= num_nibbles
         # if so shift those nibbles off of the array and call block with them
