@@ -73,7 +73,7 @@ module Nibbler
       when 0xE then lookahead(6, fragment) { |status_2, bytes| @message.pitch_bend(status_2, bytes[1], bytes[2]) }
       when 0xF then
         case nibbles[1]
-        when 0x0 then lookahead_sysex(fragment) { |bytes| @message.system_exclusive(*bytes) }
+        when 0x0 then lookahead_sysex(fragment)
         when 0x1..0x6 then lookahead(6, fragment, :recursive => true) { |status_2, bytes| @message.system_common(status_2, bytes[1], bytes[2]) }
         when 0x8..0xF then lookahead(2, fragment) { |status_2, bytes| @message.system_realtime(status_2) }
         end
@@ -160,12 +160,12 @@ module Nibbler
       end
     end
 
-    def lookahead_sysex(fragment, &message_builder)
+    def lookahead_sysex(fragment)
       cancel_running_status
       bytes = TypeConversion.hex_chars_to_numeric_bytes(fragment)
       unless (index = bytes.index(0xF7)).nil?
         message_data = bytes.slice!(0, index + 1)
-        result = yield(message_data)
+        result = @message.system_exclusive(*message_data)
         {
           :message => result,
           :processed => fragment.slice!(0, (index + 1) * 2)
