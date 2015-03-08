@@ -78,7 +78,7 @@ module Nibbler
         when 0x8..0xF then lookahead(2, fragment) { |status_2, bytes| @message.system_realtime(status_2) }
         end
       else
-        use_running_status(fragment) if possible_running_status?
+        lookahead_using_running_status(fragment) if possible_running_status?
       end
     end
 
@@ -109,7 +109,7 @@ module Nibbler
     # Attempt to convert the fragment to a MIDI message using the given fragment and cached running status
     # @param [Array<String>] fragment A fragment of data eg ["4", "0", "5", "0"]
     # @return [Hash, nil]
-    def use_running_status(fragment)
+    def lookahead_using_running_status(fragment)
       lookahead(@running_status[:num_nibbles], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:message_builder])
     end
 
