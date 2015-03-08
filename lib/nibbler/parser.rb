@@ -39,7 +39,7 @@ module Nibbler
           report[:messages] << processed[:message]
           report[:processed] += processed[:processed]
         else
-          @running_status = nil
+          cancel_running_status
           pointer += 1
         end
       end
@@ -96,6 +96,10 @@ module Nibbler
       end
     end
 
+    def cancel_running_status
+      @running_status = nil
+    end
+
     # Is there an active cached running status?
     # @return [Boolean]
     def possible_running_status?
@@ -107,6 +111,14 @@ module Nibbler
     # @return [Hash, nil]
     def use_running_status(fragment)
       lookahead(@running_status[:num_nibbles], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:message_builder])
+    end
+
+    def set_running_status(num_nibbles, status_nibble, message_builder)
+      @running_status = {
+        :message_builder => message_builder,
+        :num_nibbles => num_nibbles,
+        :status_nibble => status_nibble
+      }
     end
 
     # Get the data in the buffer for the given pointer
@@ -148,17 +160,8 @@ module Nibbler
       end
     end
 
-    def set_running_status(num_nibbles, status_nibble, message_builder)
-      @running_status = {
-        :message_builder => message_builder,
-        :num_nibbles => num_nibbles,
-        :status_nibble => status_nibble
-      }
-    end
-
     def lookahead_sysex(fragment, &message_builder)
-      @running_status = nil
-
+      cancel_running_status
       bytes = TypeConversion.hex_chars_to_numeric_bytes(fragment)
       unless (index = bytes.index(0xF7)).nil?
         message_data = bytes.slice!(0, index + 1)
