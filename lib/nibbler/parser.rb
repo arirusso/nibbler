@@ -136,11 +136,8 @@ module Nibbler
         bytes = TypeConversion.hex_chars_to_numeric_bytes(nibbles)
 
         # record the fragment situation in case running status comes up next round
-        @running_status = {
-          :message_builder => message_builder,
-          :num_nibbles => num_nibbles - 2,
-          :status_nibble => status_nibble
-        }
+        set_running_status(num_nibbles - 2, status_nibble, message_builder)
+
         result = yield(status_nibble.hex, bytes)
         {
           :message => result,
@@ -149,6 +146,14 @@ module Nibbler
       elsif num_nibbles > 0 && !!options[:recursive]
         lookahead(num_nibbles - 2, fragment, options, &message_builder)
       end
+    end
+
+    def set_running_status(num_nibbles, status_nibble, message_builder)
+      @running_status = {
+        :message_builder => message_builder,
+        :num_nibbles => num_nibbles,
+        :status_nibble => status_nibble
+      }
     end
 
     def lookahead_sysex(fragment, &message_builder)
