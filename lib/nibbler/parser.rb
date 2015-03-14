@@ -64,18 +64,18 @@ module Nibbler
     # @return [Hash, nil]
     def compute_message(nibbles, fragment)
       case nibbles[0]
-      when 0x8 then lookahead(6, fragment) { |status_2, data_bytes| @message.note_off(status_2, *data_bytes) }
-      when 0x9 then lookahead(6, fragment) { |status_2, data_bytes| @message.note_on(status_2, *data_bytes) }
-      when 0xA then lookahead(6, fragment) { |status_2, data_bytes| @message.polyphonic_aftertouch(status_2, *data_bytes) }
-      when 0xB then lookahead(6, fragment) { |status_2, data_bytes| @message.control_change(status_2, *data_bytes) }
-      when 0xC then lookahead(4, fragment) { |status_2, data_bytes| @message.program_change(status_2, *data_bytes) }
-      when 0xD then lookahead(4, fragment) { |status_2, data_bytes| @message.channel_aftertouch(status_2, *data_bytes) }
-      when 0xE then lookahead(6, fragment) { |status_2, data_bytes| @message.pitch_bend(status_2, *data_bytes) }
+      when 0x8 then lookahead(6, fragment, :note_off)
+      when 0x9 then lookahead(6, fragment, :note_on)
+      when 0xA then lookahead(6, fragment, :polyphonic_aftertouch)
+      when 0xB then lookahead(6, fragment, :control_change)
+      when 0xC then lookahead(4, fragment, :program_change)
+      when 0xD then lookahead(4, fragment, :channel_aftertouch)
+      when 0xE then lookahead(6, fragment, :pitch_bend)
       when 0xF then
         case nibbles[1]
         when 0x0 then lookahead_sysex(fragment)
-        when 0x1..0x6 then lookahead(6, fragment, :recursive => true) { |status_2, data_bytes| @message.system_common(status_2, *data_bytes) }
-        when 0x8..0xF then lookahead(2, fragment) { |status_2, data_bytes| @message.system_realtime(status_2) }
+        when 0x1..0x6 then lookahead(6, fragment, :system_common, :recursive => true)
+        when 0x8..0xF then lookahead(2, fragment, :system_realtime)
         end
       else
         lookahead_using_running_status(fragment) if @running_status.possible?
@@ -100,7 +100,7 @@ module Nibbler
     # @param [Array<String>] fragment A fragment of data eg ["4", "0", "5", "0"]
     # @return [Hash, nil]
     def lookahead_using_running_status(fragment)
-      lookahead(@running_status[:num_nibbles], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:message_builder])
+      lookahead(@running_status[:num_nibbles], fragment, @running_status[:message_type], :status_nibble => @running_status[:status_nibble])
     end
 
     # Get the data in the buffer for the given pointer
@@ -119,7 +119,7 @@ module Nibbler
     # @option options [String] :status_nibble
     # @option options [Boolean] :recursive
     # @return [Hash, nil]
-    def lookahead(num_nibbles, fragment, options = {}, &message_builder)
+    def lookahead(num_nibbles, fragment, message_type, options = {})
       if fragment.size >= num_nibbles
         # if so shift those nibbles off of the array and call block with them
         nibbles = fragment.slice!(0, num_nibbles)
@@ -131,15 +131,18 @@ module Nibbler
         bytes = bytes[1..-1] if options[:status_nibble].nil?
 
         # record the fragment situation in case running status comes up next round
-        @running_status.set(num_nibbles - 2, status_nibble, message_builder)
+        @running_status.set(num_nibbles - 2, status_nibble, message_type)
 
-        result = yield(status_nibble.hex, bytes)
+        message_args = [status_nibble.hex]
+        message_args += bytes if num_nibbles > 2
+
+        message = @message.send(message_type, *message_args)
         {
-          :message => result,
+          :message => message,
           :processed => nibbles
         }
       elsif num_nibbles > 0 && !!options[:recursive]
-        lookahead(num_nibbles - 2, fragment, options, &message_builder)
+        lookahead(num_nibbles - 2, fragment, message_type, options)
       end
     end
 
@@ -172,9 +175,9 @@ module Nibbler
         !@state.nil?
       end
 
-      def set(num_nibbles, status_nibble, message_builder)
+      def set(num_nibbles, status_nibble, message_type)
         @state = {
-          :message_builder => message_builder,
+          :message_type => message_type,
           :num_nibbles => num_nibbles,
           :status_nibble => status_nibble
         }
