@@ -7,7 +7,7 @@ module Nibbler
     # @param [Hash] options
     # @option options [Symbol] :message_lib The name of a message library module eg MIDIMessage or Midilib
     def initialize(options = {})
-      @running_status = nil
+      @running_status = RunningStatus.new
       @buffer = []
 
       initialize_message_library(options[:message_lib])
@@ -39,7 +39,7 @@ module Nibbler
           report[:messages] << processed[:message]
           report[:processed] += processed[:processed]
         else
-          cancel_running_status
+          @running_status.cancel
           pointer += 1
         end
       end
@@ -78,7 +78,7 @@ module Nibbler
         when 0x8..0xF then lookahead(2, fragment) { |status_2, data_bytes| @message.system_realtime(status_2) }
         end
       else
-        lookahead_using_running_status(fragment) if possible_running_status?
+        lookahead_using_running_status(fragment) if @running_status.possible?
       end
     end
 
@@ -96,29 +96,11 @@ module Nibbler
       end
     end
 
-    def cancel_running_status
-      @running_status = nil
-    end
-
-    # Is there an active cached running status?
-    # @return [Boolean]
-    def possible_running_status?
-      !@running_status.nil?
-    end
-
     # Attempt to convert the fragment to a MIDI message using the given fragment and cached running status
     # @param [Array<String>] fragment A fragment of data eg ["4", "0", "5", "0"]
     # @return [Hash, nil]
     def lookahead_using_running_status(fragment)
       lookahead(@running_status[:num_nibbles], fragment, :status_nibble => @running_status[:status_nibble], &@running_status[:message_builder])
-    end
-
-    def set_running_status(num_nibbles, status_nibble, message_builder)
-      @running_status = {
-        :message_builder => message_builder,
-        :num_nibbles => num_nibbles,
-        :status_nibble => status_nibble
-      }
     end
 
     # Get the data in the buffer for the given pointer
@@ -149,7 +131,7 @@ module Nibbler
         bytes = bytes[1..-1] if options[:status_nibble].nil?
 
         # record the fragment situation in case running status comes up next round
-        set_running_status(num_nibbles - 2, status_nibble, message_builder)
+        @running_status.set(num_nibbles - 2, status_nibble, message_builder)
 
         result = yield(status_nibble.hex, bytes)
         {
@@ -162,7 +144,7 @@ module Nibbler
     end
 
     def lookahead_sysex(fragment)
-      cancel_running_status
+      @running_status.cancel
       bytes = TypeConversion.hex_chars_to_numeric_bytes(fragment)
       unless (index = bytes.index(0xF7)).nil?
         message_data = bytes.slice!(0, index + 1)
@@ -172,6 +154,32 @@ module Nibbler
           :processed => fragment.slice!(0, (index + 1) * 2)
         }
       end
+    end
+
+    class RunningStatus
+
+      extend Forwardable
+
+      def_delegators :@state, :[]
+
+      def cancel
+        @state = nil
+      end
+
+      # Is there an active cached running status?
+      # @return [Boolean]
+      def possible?
+        !@state.nil?
+      end
+
+      def set(num_nibbles, status_nibble, message_builder)
+        @state = {
+          :message_builder => message_builder,
+          :num_nibbles => num_nibbles,
+          :status_nibble => status_nibble
+        }
+      end
+
     end
 
   end
