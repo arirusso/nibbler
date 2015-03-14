@@ -10,7 +10,7 @@ module Nibbler
       @running_status = RunningStatus.new
       @buffer = []
 
-      initialize_message_library(options[:message_lib])
+      MessageBuilder.use_library(options[:message_lib])
     end
 
     # Process the given nibbles and add them to the buffer
@@ -64,35 +64,14 @@ module Nibbler
     # @return [Hash, nil]
     def compute_message(nibbles, fragment)
       case nibbles[0]
-      when 0x8 then lookahead(6, fragment, :note_off)
-      when 0x9 then lookahead(6, fragment, :note_on)
-      when 0xA then lookahead(6, fragment, :polyphonic_aftertouch)
-      when 0xB then lookahead(6, fragment, :control_change)
-      when 0xC then lookahead(4, fragment, :program_change)
-      when 0xD then lookahead(4, fragment, :channel_aftertouch)
-      when 0xE then lookahead(6, fragment, :pitch_bend)
+      when 0x8..0xE then lookahead(fragment, MessageBuilder.channel_message(nibbles[0]))
       when 0xF then
         case nibbles[1]
         when 0x0 then lookahead_sysex(fragment)
-        when 0x1..0x6 then lookahead(6, fragment, :system_common, :recursive => true)
-        when 0x8..0xF then lookahead(2, fragment, :system_realtime)
+        else lookahead(fragment, MessageBuilder.system_message(nibbles[1]), :recursive => true)
         end
       else
         lookahead_using_running_status(fragment) if @running_status.possible?
-      end
-    end
-
-    # Choose a MIDI message object library
-    # @param [Symbol] lib The MIDI message library module eg MIDIMessage or Midilib
-    # @return [Module]
-    def initialize_message_library(lib)
-      @message = case lib
-      when :midilib then
-        require "nibbler/midilib"
-        ::Nibbler::Midilib
-      else
-        require "nibbler/midi-message"
-        ::Nibbler::MIDIMessage
       end
     end
 
@@ -100,7 +79,7 @@ module Nibbler
     # @param [Array<String>] fragment A fragment of data eg ["4", "0", "5", "0"]
     # @return [Hash, nil]
     def lookahead_using_running_status(fragment)
-      lookahead(@running_status[:num_nibbles], fragment, @running_status[:message_type], :status_nibble_2 => @running_status[:status_nibble_2])
+      lookahead(fragment, @running_status[:message_builder], :offset => @running_status[:offset], :status_nibble_2 => @running_status[:status_nibble_2])
     end
 
     # Get the data in the buffer for the given pointer
@@ -119,7 +98,9 @@ module Nibbler
     # @option options [String] :status_nibble_2
     # @option options [Boolean] :recursive
     # @return [Hash, nil]
-    def lookahead(num_nibbles, fragment, message_type, options = {})
+    def lookahead(fragment, message_builder, options = {})
+      offset = options.fetch(:offset, 0)
+      num_nibbles = message_builder.num_nibbles + offset
       if fragment.size >= num_nibbles
         # if so shift those nibbles off of the array and call block with them
         nibbles = fragment.slice!(0, num_nibbles)
@@ -131,18 +112,18 @@ module Nibbler
         bytes = bytes[1..-1] if options[:status_nibble_2].nil?
 
         # record the fragment situation in case running status comes up next round
-        @running_status.set(message_type, num_nibbles - 2, status_nibble_2)
+        @running_status.set(offset - 2, message_builder, status_nibble_2)
 
         message_args = [status_nibble_2.hex]
         message_args += bytes if num_nibbles > 2
 
-        message = @message.send(message_type, *message_args)
+        message = message_builder.build(*message_args)
         {
           :message => message,
           :processed => nibbles
         }
       elsif num_nibbles > 0 && !!options[:recursive]
-        lookahead(num_nibbles - 2, fragment, message_type, options)
+        lookahead(fragment, message_builder, options.merge({ :offset => offset - 2 }))
       end
     end
 
@@ -151,7 +132,7 @@ module Nibbler
       bytes = TypeConversion.hex_chars_to_numeric_bytes(fragment)
       unless (index = bytes.index(0xF7)).nil?
         message_data = bytes.slice!(0, index + 1)
-        message = @message.system_exclusive(*message_data)
+        message = MessageBuilder.build_system_exclusive(*message_data)
         {
           :message => message,
           :processed => fragment.slice!(0, (index + 1) * 2)
@@ -175,10 +156,10 @@ module Nibbler
         !@state.nil?
       end
 
-      def set(message_type, num_nibbles, status_nibble_2)
+      def set(offset, message_builder, status_nibble_2)
         @state = {
-          :message_type => message_type,
-          :num_nibbles => num_nibbles,
+          :message_builder => message_builder,
+          :offset => offset,
           :status_nibble_2 => status_nibble_2
         }
       end

@@ -7,7 +7,7 @@ class Nibbler::ParserTest < Minitest::Test
     num = 6
     parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0"])
     fragment = parser.send(:get_fragment, 0)
-    output = parser.send(:lookahead, num, fragment, :note_on)
+    output = parser.send(:lookahead, fragment, Nibbler::MessageBuilder.channel_message(0x9))
     assert_equal([0x90, 0x40, 0x50], output[:message].to_a)
     assert_equal(["9", "0", "4", "0", "5", "0"], output[:processed])
   end
@@ -17,7 +17,7 @@ class Nibbler::ParserTest < Minitest::Test
     num = 6
     parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0", "5", "0"])
     fragment = parser.send(:get_fragment, 0)
-    output = parser.send(:lookahead, num, fragment, :note_on)
+    output = parser.send(:lookahead, fragment, Nibbler::MessageBuilder.channel_message(0x9))
     assert_equal([0x90, 0x40, 0x50], output[:message].to_a)
     assert_equal(["9", "0", "4", "0", "5", "0"], output[:processed])
   end
@@ -27,7 +27,7 @@ class Nibbler::ParserTest < Minitest::Test
     num = 6
     parser.instance_variable_set("@buffer", ["9", "0", "4"])
     fragment = parser.send(:get_fragment, 0)
-    output = parser.send(:lookahead, num, fragment, :note_on)
+    output = parser.send(:lookahead, fragment, Nibbler::MessageBuilder.channel_message(0x9))
 
     assert_nil output
   end
@@ -161,10 +161,10 @@ class Nibbler::ParserTest < Minitest::Test
 
   def test_message_library
     parser = Nibbler::Parser.new(:message_lib => :midilib)
-    assert_equal Nibbler::Midilib, parser.instance_variable_get("@message")
+    assert_equal Nibbler::Midilib, Nibbler::MessageBuilder.library
 
     parser = Nibbler::Parser.new
-    assert_equal Nibbler::MIDIMessage, parser.instance_variable_get("@message")
+    assert_equal Nibbler::MIDIMessage, Nibbler::MessageBuilder.library
   end
 
 end
