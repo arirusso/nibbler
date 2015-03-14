@@ -8,7 +8,7 @@ class Nibbler::ParserTest < Minitest::Test
     parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0"])
     fragment = parser.send(:get_fragment, 0)
     output = parser.send(:lookahead, num, fragment) { |nibble_2, bytes| [nibble_2, bytes] }
-    assert_equal([0,[0x90, 0x40, 0x50]], output[:message])
+    assert_equal([0,[0x40, 0x50]], output[:message])
     assert_equal(["9", "0", "4", "0", "5", "0"], output[:processed])
   end
 
@@ -18,7 +18,7 @@ class Nibbler::ParserTest < Minitest::Test
     parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0", "5", "0"])
     fragment = parser.send(:get_fragment, 0)
     output = parser.send(:lookahead, num, fragment) { |nibble_2, bytes| [nibble_2, bytes] }
-    assert_equal([0,[0x90, 0x40, 0x50]], output[:message])
+    assert_equal([0,[0x40, 0x50]], output[:message])
     assert_equal(["9", "0", "4", "0", "5", "0"], output[:processed])
   end
 

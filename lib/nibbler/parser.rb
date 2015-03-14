@@ -64,18 +64,18 @@ module Nibbler
     # @return [Hash, nil]
     def compute_message(nibbles, fragment)
       case nibbles[0]
-      when 0x8 then lookahead(6, fragment) { |status_2, bytes| @message.note_off(status_2, bytes[1], bytes[2]) }
-      when 0x9 then lookahead(6, fragment) { |status_2, bytes| @message.note_on(status_2, bytes[1], bytes[2]) }
-      when 0xA then lookahead(6, fragment) { |status_2, bytes| @message.polyphonic_aftertouch(status_2, bytes[1], bytes[2]) }
-      when 0xB then lookahead(6, fragment) { |status_2, bytes| @message.control_change(status_2, bytes[1], bytes[2]) }
-      when 0xC then lookahead(4, fragment) { |status_2, bytes| @message.program_change(status_2, bytes[1]) }
-      when 0xD then lookahead(4, fragment) { |status_2, bytes| @message.channel_aftertouch(status_2, bytes[1]) }
-      when 0xE then lookahead(6, fragment) { |status_2, bytes| @message.pitch_bend(status_2, bytes[1], bytes[2]) }
+      when 0x8 then lookahead(6, fragment) { |status_2, data_bytes| @message.note_off(status_2, *data_bytes) }
+      when 0x9 then lookahead(6, fragment) { |status_2, data_bytes| @message.note_on(status_2, *data_bytes) }
+      when 0xA then lookahead(6, fragment) { |status_2, data_bytes| @message.polyphonic_aftertouch(status_2, *data_bytes) }
+      when 0xB then lookahead(6, fragment) { |status_2, data_bytes| @message.control_change(status_2, *data_bytes) }
+      when 0xC then lookahead(4, fragment) { |status_2, data_bytes| @message.program_change(status_2, *data_bytes) }
+      when 0xD then lookahead(4, fragment) { |status_2, data_bytes| @message.channel_aftertouch(status_2, *data_bytes) }
+      when 0xE then lookahead(6, fragment) { |status_2, data_bytes| @message.pitch_bend(status_2, *data_bytes) }
       when 0xF then
         case nibbles[1]
         when 0x0 then lookahead_sysex(fragment)
-        when 0x1..0x6 then lookahead(6, fragment, :recursive => true) { |status_2, bytes| @message.system_common(status_2, bytes[1], bytes[2]) }
-        when 0x8..0xF then lookahead(2, fragment) { |status_2, bytes| @message.system_realtime(status_2) }
+        when 0x1..0x6 then lookahead(6, fragment, :recursive => true) { |status_2, data_bytes| @message.system_common(status_2, *data_bytes) }
+        when 0x8..0xF then lookahead(2, fragment) { |status_2, data_bytes| @message.system_realtime(status_2) }
         end
       else
         lookahead_using_running_status(fragment) if possible_running_status?
@@ -146,6 +146,7 @@ module Nibbler
         # send the nibbles to the block as bytes
         # return the evaluated block and the remaining nibbles
         bytes = TypeConversion.hex_chars_to_numeric_bytes(nibbles)
+        bytes = bytes[1..-1] if options[:status_nibble].nil?
 
         # record the fragment situation in case running status comes up next round
         set_running_status(num_nibbles - 2, status_nibble, message_builder)
