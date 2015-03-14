@@ -22,6 +22,14 @@ module Nibbler
       end
     end
 
+    def self.system_message(status)
+      SYSTEM_MESSAGE.select { |k,v| k.cover?(status) }.values.first
+    end
+
+    def self.channel_message(status)
+      CHANNEL_MESSAGE[status]
+    end
+
     def initialize(type, num_nibbles)
       @type = type
       @num_nibbles = num_nibbles
@@ -33,14 +41,6 @@ module Nibbler
 
     def self.build_system_exclusive(*args)
       @library.system_exclusive(*args)
-    end
-
-    def self.system_message(status)
-      SYSTEM_MESSAGE.select { |k,v| k.cover?(status) }.values.first
-    end
-
-    def self.channel_message(status)
-      CHANNEL_MESSAGE[status]
     end
 
     CHANNEL_MESSAGE = {
