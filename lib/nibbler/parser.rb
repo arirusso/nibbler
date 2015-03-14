@@ -100,7 +100,7 @@ module Nibbler
     # @param [Array<String>] fragment A fragment of data eg ["4", "0", "5", "0"]
     # @return [Hash, nil]
     def lookahead_using_running_status(fragment)
-      lookahead(@running_status[:num_nibbles], fragment, @running_status[:message_type], :status_nibble => @running_status[:status_nibble])
+      lookahead(@running_status[:num_nibbles], fragment, @running_status[:message_type], :status_nibble_2 => @running_status[:status_nibble_2])
     end
 
     # Get the data in the buffer for the given pointer
@@ -116,24 +116,24 @@ module Nibbler
     # @param [Fixnum] num_nibbles
     # @param [Array<String>] fragment
     # @param [Hash] options
-    # @option options [String] :status_nibble
+    # @option options [String] :status_nibble_2
     # @option options [Boolean] :recursive
     # @return [Hash, nil]
     def lookahead(num_nibbles, fragment, message_type, options = {})
       if fragment.size >= num_nibbles
         # if so shift those nibbles off of the array and call block with them
         nibbles = fragment.slice!(0, num_nibbles)
-        status_nibble ||= options[:status_nibble] || nibbles[1]
+        status_nibble_2 ||= options[:status_nibble_2] || nibbles[1]
 
         # send the nibbles to the block as bytes
         # return the evaluated block and the remaining nibbles
         bytes = TypeConversion.hex_chars_to_numeric_bytes(nibbles)
-        bytes = bytes[1..-1] if options[:status_nibble].nil?
+        bytes = bytes[1..-1] if options[:status_nibble_2].nil?
 
         # record the fragment situation in case running status comes up next round
-        @running_status.set(num_nibbles - 2, status_nibble, message_type)
+        @running_status.set(message_type, num_nibbles - 2, status_nibble_2)
 
-        message_args = [status_nibble.hex]
+        message_args = [status_nibble_2.hex]
         message_args += bytes if num_nibbles > 2
 
         message = @message.send(message_type, *message_args)
@@ -151,9 +151,9 @@ module Nibbler
       bytes = TypeConversion.hex_chars_to_numeric_bytes(fragment)
       unless (index = bytes.index(0xF7)).nil?
         message_data = bytes.slice!(0, index + 1)
-        result = @message.system_exclusive(*message_data)
+        message = @message.system_exclusive(*message_data)
         {
-          :message => result,
+          :message => message,
           :processed => fragment.slice!(0, (index + 1) * 2)
         }
       end
@@ -175,11 +175,11 @@ module Nibbler
         !@state.nil?
       end
 
-      def set(num_nibbles, status_nibble, message_type)
+      def set(message_type, num_nibbles, status_nibble_2)
         @state = {
           :message_type => message_type,
           :num_nibbles => num_nibbles,
-          :status_nibble => status_nibble
+          :status_nibble_2 => status_nibble_2
         }
       end
 
