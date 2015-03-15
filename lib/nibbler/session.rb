@@ -20,11 +20,13 @@ module Nibbler
     def_delegator :clear_messages, :messages, :clear
 
     # @param [Hash] options
+    # @option options [Symbol] :message_lib The name of a message library module eg MIDIMessage or Midilib
     # @option options [Boolean] :timestamps Whether to report timestamps
     def initialize(options = {})
       @timestamps = options[:timestamps] || false
       @callbacks, @processed, @rejected, @messages = [], [], [], []
-      @parser = Parser.new(options)
+      MessageBuilder.use_library(options[:message_lib])
+      @parser = Parser.new
     end
 
     # @return [Array<Object>]

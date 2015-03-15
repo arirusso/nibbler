@@ -4,13 +4,9 @@ module Nibbler
 
     attr_reader :buffer
 
-    # @param [Hash] options
-    # @option options [Symbol] :message_lib The name of a message library module eg MIDIMessage or Midilib
-    def initialize(options = {})
+    def initialize
       @running_status = RunningStatus.new
       @buffer = []
-
-      MessageBuilder.use_library(options[:message_lib])
     end
 
     # Process the given nibbles and add them to the buffer
@@ -67,7 +63,7 @@ module Nibbler
       when 0x8..0xE then lookahead(fragment, MessageBuilder.channel_message(nibbles[0]))
       when 0xF then
         case nibbles[1]
-        when 0x0 then lookahead_sysex(fragment)
+        when 0x0 then lookahead_for_sysex(fragment)
         else lookahead(fragment, MessageBuilder.system_message(nibbles[1]), :recursive => true)
         end
       else
@@ -127,7 +123,7 @@ module Nibbler
       end
     end
 
-    def lookahead_sysex(fragment)
+    def lookahead_for_sysex(fragment)
       @running_status.cancel
       bytes = TypeConversion.hex_chars_to_numeric_bytes(fragment)
       unless (index = bytes.index(0xF7)).nil?
