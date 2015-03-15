@@ -4,10 +4,6 @@ module Nibbler
 
     attr_reader :num_nibbles, :type
 
-    class << self
-      attr_reader :library
-    end
-
     # Choose a MIDI message object library
     # @param [Symbol] lib The MIDI message library module eg MIDIMessage or Midilib
     # @return [Module]
@@ -20,6 +16,14 @@ module Nibbler
         require "nibbler/midi-message"
         ::Nibbler::MIDIMessage
       end
+    end
+
+    def self.library
+      @library ||= use_library(:midi_message)
+    end
+
+    def self.build_system_exclusive(*args)
+      library.system_exclusive(*args)
     end
 
     def self.system_message(status)
@@ -37,10 +41,6 @@ module Nibbler
 
     def build(*args)
       self.class.library.send(@type, *args)
-    end
-
-    def self.build_system_exclusive(*args)
-      @library.system_exclusive(*args)
     end
 
     CHANNEL_MESSAGE = {
