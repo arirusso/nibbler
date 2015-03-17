@@ -2,61 +2,82 @@ module Nibbler
 
   class MessageBuilder
 
-    attr_reader :num_nibbles, :type
+    CHANNEL_MESSAGE = [
+      {
+        :status => 0x8,
+        :name => :note_off,
+        :nibbles => 6
+      },
+      {
+        :status => 0x9,
+        :name => :note_on,
+        :nibbles => 6
+      },
+      {
+        :status => 0xA,
+        :name => :polyphonic_aftertouch,
+        :nibbles => 6
+      },
+      {
+        :status => 0xB,
+        :name => :control_change,
+        :nibbles => 6
+      },
+      {
+        :status => 0xC,
+        :name => :program_change,
+        :nibbles => 4
+      },
+      {
+        :status => 0xD,
+        :name => :channel_aftertouch,
+        :nibbles => 4
+      },
+      {
+        :status => 0xE,
+        :name => :pitch_bend,
+        :nibbles => 6
+      }
+    ].freeze
 
-    # Choose a MIDI message object library
-    # @param [Symbol] lib The MIDI message library module eg MIDIMessage or Midilib
-    # @return [Module]
-    def self.use_library(lib)
-      @library = case lib
-      when :midilib then
-        require "nibbler/midilib"
-        ::Nibbler::Midilib
-      else
-        require "nibbler/midi-message"
-        ::Nibbler::MIDIMessage
-      end
+    SYSTEM_MESSAGE = [
+      {
+        :status => 0x1..0x6,
+        :name => :system_common,
+        :nibbles => 6
+      },
+      {
+        :status => 0x8..0xF,
+        :name => :system_realtime,
+        :nibbles => 2
+      }
+    ].freeze
+
+    attr_reader :num_nibbles, :name
+
+    def self.build_system_exclusive(library, *message_data)
+      library.system_exclusive(*message_data)
     end
 
-    def self.library
-      @library ||= use_library(:midi_message)
+    def self.system_message(library, status)
+      type = SYSTEM_MESSAGE.find { |type| type[:status].cover?(status) }
+      new(library, type[:name], type[:nibbles])
     end
 
-    def self.build_system_exclusive(*args)
-      library.system_exclusive(*args)
+    def self.channel_message(library, status)
+      type = CHANNEL_MESSAGE.find { |type| type[:status] == status }
+      new(library, type[:name], type[:nibbles])
     end
 
-    def self.system_message(status)
-      SYSTEM_MESSAGE.select { |k,v| k.cover?(status) }.values.first
-    end
-
-    def self.channel_message(status)
-      CHANNEL_MESSAGE[status]
-    end
-
-    def initialize(type, num_nibbles)
-      @type = type
+    def initialize(library, name, num_nibbles)
+      @library = library
+      @name = name
       @num_nibbles = num_nibbles
     end
 
-    def build(*args)
-      self.class.library.send(@type, *args)
+    def build(*message_data)
+      @library.send(@name, *message_data)
     end
-
-    CHANNEL_MESSAGE = {
-      0x8 => MessageBuilder.new(:note_off, 6),
-      0x9 => MessageBuilder.new(:note_on, 6),
-      0xA => MessageBuilder.new(:polyphonic_aftertouch, 6),
-      0xB => MessageBuilder.new(:control_change, 6),
-      0xC => MessageBuilder.new(:program_change, 4),
-      0xD => MessageBuilder.new(:channel_aftertouch, 4),
-      0xE => MessageBuilder.new(:pitch_bend, 6)
-    }.freeze
-
-    SYSTEM_MESSAGE = {
-      0x1..0x6 => MessageBuilder.new(:system_common, 6),
-      0x8..0xF => MessageBuilder.new(:system_realtime, 2)
-    }.freeze
 
   end
 

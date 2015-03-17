@@ -25,8 +25,8 @@ module Nibbler
     def initialize(options = {})
       @timestamps = options[:timestamps] || false
       @callbacks, @processed, @rejected, @messages = [], [], [], []
-      MessageBuilder.use_library(options[:message_lib])
-      @parser = Parser.new
+      @library = MessageLibrary.adapter(options[:message_lib])
+      @parser = Parser.new(@library)
     end
 
     # @return [Array<Object>]

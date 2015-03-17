@@ -13,6 +13,7 @@ require "nibbler/type_conversion"
 
 # classes
 require "nibbler/message_builder"
+require "nibbler/message_library"
 require "nibbler/parser"
 require "nibbler/session"
 
