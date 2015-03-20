@@ -61,11 +61,11 @@ module Nibbler
     # @return [Hash, nil]
     def compute_message(nibbles, fragment)
       case nibbles[0]
-      when 0x8..0xE then lookahead(fragment, MessageBuilder.channel_message(@library, nibbles[0]))
+      when 0x8..0xE then lookahead(fragment, MessageBuilder.for_channel_message(@library, nibbles[0]))
       when 0xF then
         case nibbles[1]
         when 0x0 then lookahead_for_sysex(fragment)
-        else lookahead(fragment, MessageBuilder.system_message(@library, nibbles[1]), :recursive => true)
+        else lookahead(fragment, MessageBuilder.for_system_message(@library, nibbles[1]), :recursive => true)
         end
       else
         lookahead_using_running_status(fragment) if @running_status.possible?

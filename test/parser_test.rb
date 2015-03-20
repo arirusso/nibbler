@@ -16,7 +16,7 @@ class Nibbler::ParserTest < Minitest::Test
         setup do
           @parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0"])
           fragment = @parser.send(:get_fragment, 0)
-          @output = @parser.send(:lookahead, fragment, Nibbler::MessageBuilder.channel_message(@library, 0x9))
+          @output = @parser.send(:lookahead, fragment, Nibbler::MessageBuilder.for_channel_message(@library, 0x9))
         end
 
         should "return proper message" do
@@ -31,7 +31,7 @@ class Nibbler::ParserTest < Minitest::Test
         setup do
           @parser.instance_variable_set("@buffer", ["9", "0", "4", "0", "5", "0", "5", "0"])
           fragment = @parser.send(:get_fragment, 0)
-          @output = @parser.send(:lookahead, fragment, Nibbler::MessageBuilder.channel_message(@library, 0x9))
+          @output = @parser.send(:lookahead, fragment, Nibbler::MessageBuilder.for_channel_message(@library, 0x9))
         end
 
         should "disregard trailing nibbles and return proper messages" do
@@ -46,7 +46,7 @@ class Nibbler::ParserTest < Minitest::Test
         setup do
           @parser.instance_variable_set("@buffer", ["9", "0", "4"])
           fragment = @parser.send(:get_fragment, 0)
-          @output = @parser.send(:lookahead, fragment, Nibbler::MessageBuilder.channel_message(@library, 0x9))
+          @output = @parser.send(:lookahead, fragment, Nibbler::MessageBuilder.for_channel_message(@library, 0x9))
         end
 
         should "not return anything" do

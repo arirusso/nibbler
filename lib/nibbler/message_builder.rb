@@ -59,12 +59,12 @@ module Nibbler
       library.system_exclusive(*message_data)
     end
 
-    def self.system_message(library, status)
+    def self.for_system_message(library, status)
       type = SYSTEM_MESSAGE.find { |type| type[:status].cover?(status) }
       new(library, type[:name], type[:nibbles])
     end
 
-    def self.channel_message(library, status)
+    def self.for_channel_message(library, status)
       type = CHANNEL_MESSAGE.find { |type| type[:status] == status }
       new(library, type[:name], type[:nibbles])
     end
