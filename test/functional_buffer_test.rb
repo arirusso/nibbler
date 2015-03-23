@@ -1,6 +1,6 @@
 require "helper"
 
-class Nibbler::BufferTest < Minitest::Test
+class Nibbler::FunctionalBufferTest < Minitest::Test
 
   context "Parser::Buffer" do
 
