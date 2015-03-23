@@ -1,6 +1,6 @@
 require "helper"
 
-class Nibbler::ParserRejectedTest < Minitest::Test
+class Nibbler::FunctionalRejectedTest < Minitest::Test
 
   context "Rejected" do
 
