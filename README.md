@@ -1,6 +1,6 @@
 # Nibbler
 
-![nibbler](http://img17.imageshack.us/img17/1713/dogwithsynth.jpg)
+![nibbler](http://i.imgur.com/4BFZPJY.png)
 
 Parse MIDI Messages
 
