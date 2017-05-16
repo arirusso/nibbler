@@ -100,7 +100,7 @@ module Nibbler
     end
 
     # @param [Array<Object>] messages The MIDI messages to log
-    # @return [Fixnum] The number of MIDI messages logged
+    # @return [Integer] The number of MIDI messages logged
     def log_message(messages, options = {})
       if @timestamps
         messages_for_log = messages.count == 1 ? messages.first : messages
@@ -124,7 +124,7 @@ module Nibbler
     # 1 message: the message
     # >1 message: an array of messages
     #
-    # @param [Fixnum] num The number of new messages to report
+    # @param [Integer] num The number of new messages to report
     # @return [Array<Object>, Hash]
     def get_output(num)
       messages = @messages.last(num)

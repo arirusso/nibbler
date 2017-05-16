@@ -8,7 +8,7 @@ module Nibbler
     # Converts an array of hex nibble strings to numeric bytes
     # eg ["9", "0", "5", "0", "4", "0"] => [0x90, 0x50, 0x40]
     # @param [Array<String>] nibbles
-    # @return [Array<Fixnum>]
+    # @return [Array<Integer>]
     def hex_chars_to_numeric_bytes(nibbles)
       nibbles = nibbles.dup
       # get rid of last nibble if there's an odd number
@@ -57,7 +57,7 @@ module Nibbler
     end
 
     # Converts a numeric byte to an array of hex nibble strings eg 0x90 => ["9", "0"]
-    # @param [Fixnum] num
+    # @param [Integer] num
     # @return [Array<String>]
     def numeric_byte_to_hex_chars(num)
       nibbles = numeric_byte_to_numeric_nibbles(num)
@@ -65,7 +65,7 @@ module Nibbler
     end
 
     # Converts a numeric byte to an array of numeric nibbles eg 0x90 => [0x9, 0x0]
-    # @param [Fixnum] num
+    # @param [Integer] num
     # @return [Array<String>]
     def numeric_byte_to_numeric_nibbles(num)
       [((num & 0xF0) >> 4), (num & 0x0F)]

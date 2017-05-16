@@ -11,7 +11,7 @@ module Nibbler
     end
 
     # Process the given nibbles and add them to the buffer
-    # @param [Array<String, Fixnum>] nibbles
+    # @param [Array<String, Integer>] nibbles
     # @return [Hash]
     def process(nibbles)
       report = {
@@ -57,7 +57,7 @@ module Nibbler
     private
 
     # Attempt to convert the given nibbles into a MIDI message
-    # @param [Array<Fixnum>] nibbles
+    # @param [Array<Integer>] nibbles
     # @return [Hash, nil]
     def compute_message(nibbles, fragment)
       case nibbles[0]
@@ -80,7 +80,7 @@ module Nibbler
     end
 
     # Get the data in the buffer for the given pointer
-    # @param [Fixnum] pointer
+    # @param [Integer] pointer
     # @return [Array<String>]
     def get_fragment(pointer)
       @buffer[pointer, (@buffer.length - pointer)]
@@ -89,7 +89,7 @@ module Nibbler
     # If the given fragment has at least the given number of nibbles, use it to build a hash that can be used
     # to build a MIDI message
     #
-    # @param [Fixnum] num_nibbles
+    # @param [Integer] num_nibbles
     # @param [Array<String>] fragment
     # @param [Hash] options
     # @option options [String] :status_nibble_2
