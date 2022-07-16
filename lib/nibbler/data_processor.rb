@@ -1,5 +1,6 @@
-module Nibbler
+# frozen_string_literal: true
 
+module Nibbler
   # Accepts various types of input and returns an array of hex digit chars
   #
   # Ideally this would output Integer objects. However, given that Ruby numerics 0x0 and 0x00 result in the same
@@ -8,7 +9,6 @@ module Nibbler
   # For example, if the input were "5" then the processor would return an ambiguous 0x5
   #
   module DataProcessor
-
     extend self
 
     # Accepts various types of input and returns an array of hex digit chars
@@ -27,9 +27,9 @@ module Nibbler
     # @return [Array<String>]
     def convert(value)
       case value
-        when Array then value.map { |arr| process(*arr) }.reduce(:+)
-        when String then TypeConversion.hex_str_to_hex_chars(filter_string(value))
-        when Integer then TypeConversion.numeric_byte_to_hex_chars(filter_numeric(value))
+      when Array then value.map { |arr| process(*arr) }.reduce(:+)
+      when String then TypeConversion.hex_str_to_hex_chars(filter_string(value))
+      when Integer then TypeConversion.numeric_byte_to_hex_chars(filter_numeric(value))
       end
     end
 
@@ -45,9 +45,7 @@ module Nibbler
     # @param [String] string
     # @return [String]
     def filter_string(string)
-      string.gsub(/[^0-9a-fA-F]/, "").upcase
+      string.gsub(/[^0-9a-fA-F]/, '').upcase
     end
-
   end
-
 end
