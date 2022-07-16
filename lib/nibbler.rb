@@ -1,32 +1,32 @@
+# frozen_string_literal: true
+
 #
 # Nibbler
 # Parse MIDI Messages
-# (c)2011-2015 Ari Russo and licensed under the Apache 2.0 License
+# (c)2011-2022 Ari Russo and licensed under the Apache 2.0 License
 #
 
 # libs
-require "forwardable"
+require 'forwardable'
 
 # modules
-require "nibbler/data_processor"
-require "nibbler/type_conversion"
+require 'nibbler/data_processor'
+require 'nibbler/type_conversion'
 
 # classes
-require "nibbler/message_builder"
-require "nibbler/message_library"
-require "nibbler/parser"
-require "nibbler/session"
+require 'nibbler/message_builder'
+require 'nibbler/message_library'
+require 'nibbler/parser'
+require 'nibbler/session'
 
 #
 # Parse MIDI Messages
 #
 module Nibbler
+  VERSION = '0.2.4'
 
-  VERSION = "0.2.4"
-
-  # Shortcut to a new parser session
-  def self.new(*a, &block)
-    Session.new(*a, &block)
+  # Shortcut to a new session object
+  def self.new(*args, &block)
+    Session.new(*args, &block)
   end
-
 end

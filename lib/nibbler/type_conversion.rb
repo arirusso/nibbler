@@ -1,9 +1,9 @@
-module Nibbler
+# frozen_string_literal: true
 
+module Nibbler
   # A helper for converting between different types of nibbles and bytes
   module TypeConversion
-
-    extend self
+    module_function
 
     # Converts an array of hex nibble strings to numeric bytes
     # eg ["9", "0", "5", "0", "4", "0"] => [0x90, 0x50, 0x40]
@@ -13,9 +13,9 @@ module Nibbler
       nibbles = nibbles.dup
       # get rid of last nibble if there's an odd number
       # it will be processed later anyway
-      nibbles.slice!(nibbles.length-2, 1) if nibbles.length.odd?
+      nibbles.slice!(nibbles.length - 2, 1) if nibbles.length.odd?
       bytes = []
-      until (nibs = nibbles.slice!(0,2)).empty?
+      until (nibs = nibbles.slice!(0, 2)).empty?
         byte = (nibs[0].hex << 4) + nibs[1].hex
         bytes << byte
       end
@@ -70,7 +70,5 @@ module Nibbler
     def numeric_byte_to_numeric_nibbles(num)
       [((num & 0xF0) >> 4), (num & 0x0F)]
     end
-
   end
-
 end

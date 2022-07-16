@@ -1,12 +1,10 @@
-module Nibbler
+# frozen_string_literal: true
 
-  # A parser session
-  #
-  # Holds on to data that is not relevant to the parser between calls. For instance,
-  # past messages, rejected bytes
+module Nibbler
+  # A wrapper for the parser that has additional state properties. for example,
+  # past messages, rejected bytes. These state properties aren't used by the parser.
   #
   class Session
-
     extend Forwardable
 
     attr_reader :messages,
@@ -24,7 +22,10 @@ module Nibbler
     # @option options [Boolean] :timestamps Whether to report timestamps
     def initialize(options = {})
       @timestamps = options[:timestamps] || false
-      @callbacks, @processed, @rejected, @messages = [], [], [], []
+      @callbacks = []
+      @processed = []
+      @rejected = []
+      @messages = []
       @library = MessageLibrary.adapter(options[:message_lib])
       @parser = Parser.new(@library)
     end
@@ -39,7 +40,7 @@ module Nibbler
     def buffer_s
       buffer.join
     end
-    alias_method :buffer_hex, :buffer_s
+    alias buffer_hex buffer_s
 
     # Clear the parser buffer
     def clear_buffer
@@ -53,15 +54,15 @@ module Nibbler
 
     # Convert messages to hashes with timestamps
     def use_timestamps
-      if !@timestamps
-        @messages = @messages.map do |message|
-          {
-            :messages => message,
-            :timestamp => nil
-          }
-        end
-        @timestamps = true
+      return if @timestamps
+
+      @messages = @messages.map do |message|
+        {
+          messages: message,
+          timestamp: nil
+        }
       end
+      @timestamps = true
     end
 
     # Parse some input
@@ -70,10 +71,10 @@ module Nibbler
     # @option options [Time] :timestamp A timestamp to store with the messages that result
     # @return [Array<Object>, Hash]
     def parse(*args)
-      options = args.last.kind_of?(Hash) ? args.pop : {}
+      options = args.last.is_a?(Hash) ? args.pop : {}
       timestamp = options[:timestamp]
 
-      use_timestamps if !timestamp.nil?
+      use_timestamps unless timestamp.nil?
 
       result = process(args)
       log(result, timestamp)
@@ -93,7 +94,7 @@ module Nibbler
     # @param [Time] timestamp
     # @return [Array<Object>, Hash]
     def log(parser_report, timestamp)
-      num = log_message(parser_report[:messages], :timestamp => timestamp)
+      num = log_message(parser_report[:messages], timestamp: timestamp)
       @processed += parser_report[:processed]
       @rejected += parser_report[:rejected]
       get_output(num)
@@ -105,8 +106,8 @@ module Nibbler
       if @timestamps
         messages_for_log = messages.count == 1 ? messages.first : messages
         @messages << {
-          :messages => messages_for_log,
-          :timestamp => options[:timestamp]
+          messages: messages_for_log,
+          timestamp: options[:timestamp]
         }
       else
         @messages += messages
@@ -130,7 +131,5 @@ module Nibbler
       messages = @messages.last(num)
       messages.count < 2 ? messages.first : messages
     end
-
   end
-
 end
