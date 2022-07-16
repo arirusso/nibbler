@@ -64,18 +64,6 @@ pp 'Pass in a timestamp'
 
 pp nibbler.parse('904040', timestamp: Time.now.to_i)
 
-pp 'Add callbacks'
-
-# you can list any properties of the message to check against.
-# if they are all true, the callback will fire
-#
-# if you wish to use "or" or any more advanced matching I would just process the message after it"s
-# returned
-#
-nibbler.when({ class: MIDIMessage::NoteOn }) { |_msg| puts 'bark' }
-pp nibbler.parse('904040')
-pp nibbler.parse('804040')
-
 pp 'Generate midilib messages'
 
 midilib_nibbler = Nibbler.new(message_lib: :midilib)
