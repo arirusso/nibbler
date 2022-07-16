@@ -20,6 +20,21 @@ require 'nibbler'
 nibbler = Nibbler.new
 ```
 
+Enter a message represented as string bytes
+
+```ruby
+nibbler.parse('904040')
+
+  => #<MIDIMessage::NoteOn:0x98c9818
+        @channel=0,
+        @data=[64, 100],
+        @name="C3",
+        @note=64,
+        @status=[9, 0],
+        @velocity=100,
+        @verbose_name="Note On: C3">
+```
+
 Enter a message byte by byte
 
 ```ruby
@@ -40,29 +55,14 @@ nibbler.parse('40')
        @verbose_name="Note On: C3">
 ```
 
-Enter a message all at once
-
-```ruby
-nibbler.parse('904040')
-
-  => #<MIDIMessage::NoteOn:0x98c9818
-        @channel=0,
-        @data=[64, 100],
-        @name="C3",
-        @note=64,
-        @status=[9, 0],
-        @velocity=100,
-        @verbose_name="Note On: C3">
-```
-
-Use bytes
+Use numeric bytes
 
 ```ruby
 nibbler.parse(0x90, 0x40, 0x40)
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
 ```
 
-You can use nibbles in string format
+You can enter nibbles in string format
 
 ```ruby
 nibbler.parse('9', '0', '4', '0', '4', '0')
@@ -83,7 +83,7 @@ nibbler.parse(0x40, 64)
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
 ```
 
-Look at the messages we've parsed
+Look at the messages we've parsed so far
 
 ```ruby
 nibbler.messages
