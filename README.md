@@ -20,10 +20,10 @@ require 'nibbler'
 nibbler = Nibbler.new
 ```
 
-Enter a message represented as string bytes
+Enter a MIDI message represented as string bytes
 
 ```ruby
-nibbler.parse('904040')
+nibbler.parse('904064')
 
   => #<MIDIMessage::NoteOn:0x98c9818
         @channel=0,
@@ -44,7 +44,7 @@ nibbler.parse('90')
 nibbler.parse('40')
   => nil
 
-nibbler.parse('40')
+nibbler.parse('64')
   => #<MIDIMessage::NoteOn:0x98c9818
        @channel=0,
        @data=[64, 100],
@@ -58,28 +58,28 @@ nibbler.parse('40')
 Use numeric bytes
 
 ```ruby
-nibbler.parse(0x90, 0x40, 0x40)
+nibbler.parse(0x90, 0x40, 0x64)
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
 ```
 
 You can enter nibbles in string format
 
 ```ruby
-nibbler.parse('9', '0', '4', '0', '4', '0')
+nibbler.parse('9', '0', '4', '0', '6', '4')
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
 ```
 
 Interchange the different types
 
 ```ruby
-nibbler.parse('9', '0', 0x40, 64)
+nibbler.parse('9', '0', 0x40, 100)
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
 ```
 
 Use running status
 
 ```ruby
-nibbler.parse(0x40, 64)
+nibbler.parse(0x40, 100)
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
 ```
 
@@ -111,14 +111,14 @@ nibbler.buffer_s
 Pass in a timestamp
 
 ```ruby
-nibbler.parse('904040', :timestamp => Time.now.to_i)
+nibbler.parse('904064', timestamp: Time.now.to_i)
   => { :messages=> #<MIDIMessage::NoteOn:0x92f4564 ..>, :timestamp=>1304488440 }
 ```
 
-Nibbler defaults to generate [midi-message](http://github.com/arirusso/midi-message) objects, but it is also possible to use [midilib](https://github.com/jimm/midilib)
+Nibbler defaults to generate [midi-message](http://github.com/arirusso/midi-message) objects, but it's also possible to use [midilib](https://github.com/jimm/midilib)
 
 ```ruby
-Nibbler.new(:message_lib => :midilib)
+Nibbler.new(message_lib: :midilib)
 
 nibbler.parse('9', '0', 0x40, '40')
   => "0: ch 00 on 40 40"

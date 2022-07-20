@@ -65,7 +65,7 @@ describe Nibbler::Parser do
   end
 
   describe '#process' do
-    let!(:output) { parser.send(:process, input) }
+    let!(:output) { parser.process(input) }
 
     context 'when basic' do
       let(:input) { %w[9 0 4 0 5 0 5 0] }

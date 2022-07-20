@@ -20,7 +20,7 @@ describe Nibbler::Session do
     let(:report) { session.parse(0x90, 0x40, 0x40, timestamp: timestamp) }
     let(:message) { report[:messages] }
 
-    it 'returns correct message and timestamp' do
+    it 'returns correct message and timestamp in report' do
       expect(message).to_not be_nil
       expect(message).to be_a(MIDIMessage::NoteOn)
       expect(message.channel).to eq(0)

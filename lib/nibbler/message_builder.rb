@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module Nibbler
-  # Build a MIDI message from constrained raw data
+  # Build a MIDI message from constrained raw data.
+  # Enables Nibbler to use multiple MIDI message libraries
   class MessageBuilder
     CHANNEL_MESSAGE = [
       {

@@ -11,14 +11,30 @@ module Nibbler
       @buffer = []
     end
 
-    # Process the given nibbles and add them to the buffer
+    # Process the given nibbles and add them to the buffer.
+    # Returns a Hash report about the current state of the buffer. eg
+    # with no prior input, `Parser.process(%w[5 0 9 0 4 0 5 0])` will return
+    # {
+    #   :messages=>[#<MIDIMessage::NoteOn:0x000000010cdc60b0
+    #     @status=[9, 0],
+    #     @data=[64, 80],
+    #     @channel=0,
+    #     @note=64,
+    #     @velocity=80,
+    #     @const=#<MIDIMessage::Constant::Map:0x000000010cad9780 @key="E4", @value=64>,
+    #     @name="E4",
+    #     @verbose_name="Note On: E4">],
+    #   :processed=>["9", "0", "4", "0", "5", "0"],
+    #   :rejected=>["5", "0"]
+    # }
+    #
     # @param [Array<String, Integer>] nibbles
     # @return [Hash]
     def process(nibbles)
       report = { messages: [], processed: [], rejected: [] }
       pointer = 0
       @buffer += nibbles
-      # Iterate through nibbles in the buffer until a status message is found
+      # Iterate forward through nibbles in the buffer until a status message is found
       while pointer <= (@buffer.length - 1)
         # fragment is the data from the buffer to look at during the current iteration
         fragment = get_fragment_from_buffer(pointer)
@@ -30,9 +46,9 @@ module Nibbler
     private
 
     def process_fragment(fragment, pointer, report)
-      # See if there really is a message there
+      # Attempt to convert the fragment to a MIDI message object
       if (processed = nibbles_to_message(fragment))
-        # if fragment contains a real message, reject the loose nibbles that precede it
+        # if fragment contains a real message, reject the loose nibbles that preceded it
         report[:rejected] += @buffer.slice(0, pointer)
         # and record it
         @buffer = fragment.dup # fragment now has the remaining nibbles for next pass
@@ -80,15 +96,15 @@ module Nibbler
                                                              status_nibble2: @running_status[:status_nibble2])
     end
 
-    # Get the data in the buffer for the given pointer
+    # Get the data in the buffer beginning with the given pointer
     # @param [Integer] pointer
     # @return [Array<String>]
     def get_fragment_from_buffer(pointer)
       @buffer[pointer, (@buffer.length - pointer)]
     end
 
-    # If the given fragment has at least the given number of nibbles, use it to build a hash that can be used
-    # to build a MIDI message
+    # If the given fragment has at least the number of nibbles specified by the
+    # message builder, use it to build a hash that can be used to build a MIDI message
     #
     # @param [Integer] num_nibbles
     # @param [Array<String>] fragment
