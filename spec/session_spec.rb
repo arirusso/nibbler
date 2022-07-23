@@ -6,7 +6,36 @@ describe Nibbler::Session do
   let!(:session) { Nibbler::Session.new }
 
   describe '#parse_string' do
+    let(:returned_messages) { session.parse_s(*input) }
+    let(:returned_message) { returned_messages.first }
+    let(:last_event) { session.events.last }
 
+    context 'when there is a timestamp' do
+      let(:timestamp) { Time.now.to_i }
+      let(:returned_messages) { session.parse_s('904040', timestamp: timestamp) }
+
+      it 'returns correct message' do
+        expect(returned_messages.count).to eq(1)
+        expect(returned_message).to be_a(MIDIMessage::NoteOn)
+        expect(returned_message.channel).to eq(0)
+        expect(returned_message.note).to eq(0x40)
+        expect(returned_message.velocity).to eq(0x40)
+        expect(last_event.timestamp).to eq(timestamp)
+      end
+    end
+
+    context 'when individual bytes' do
+      let(:input) { ['80', '40', '40'] }
+
+      it 'returns correct message' do
+        expect(returned_messages.count).to eq(1)
+        expect(returned_message).to_not be_nil
+        expect(returned_message).to be_a(MIDIMessage::NoteOff)
+        expect(returned_message.channel).to eq(0)
+        expect(returned_message.note).to eq(0x40)
+        expect(returned_message.velocity).to eq(0x40)
+      end
+    end
   end
 
   describe '#parse' do

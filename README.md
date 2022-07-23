@@ -55,7 +55,7 @@ nibbler.parse(0x64)
        @verbose_name="Note On: C3">
 ```
 
-Enter the message as a string
+There's also a method to parse a string
 
 ```ruby
 nibbler.parse_s('904064')
@@ -87,24 +87,20 @@ nibbler.messages
 Add an incomplete message
 
 ```ruby
-nibbler.parse('90')
-nibbler.parse('40')
+nibbler.parse_s('90')
+nibbler.parse_s('40')
 ```
 
 See progress
 
 ```ruby
 nibbler.buffer
-  => ["9", "0", "4", "0"]
-
-nibbler.buffer_s
-  => "9040"
-```
+  => [0x90, 0x40]
 
 Pass in a timestamp
 
 ```ruby
-nibbler.parse('904064', timestamp: Time.now.to_i)
+nibbler.parse(0x90, 0x40, 0x40, timestamp: Time.now.to_i)
   => { :messages=> #<MIDIMessage::NoteOn:0x92f4564 ..>, :timestamp=>1304488440 }
 ```
 

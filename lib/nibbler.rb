@@ -26,7 +26,7 @@ module Nibbler
   VERSION = '0.2.4'
 
   # Shortcut to a new session object
-  def self.new(*args, &block)
-    Session.new(*args, &block)
+  def self.new(message_lib: nil)
+    Session.new(message_lib: message_lib)
   end
 end

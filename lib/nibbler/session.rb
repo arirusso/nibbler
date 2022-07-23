@@ -22,6 +22,14 @@ module Nibbler
       @parser = Parser.new(library)
     end
 
+    def parse_string(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+
+      integers = StringConversion.convert_strings_to_numeric_bytes(*args)
+      parse(*integers)
+    end
+    alias parse_s parse_string
+
     # Parse some input
     # @param [*Object] args
     # @param [Hash] options (can be included as the last arg)
