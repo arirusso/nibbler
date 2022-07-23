@@ -10,15 +10,15 @@
 require 'forwardable'
 
 # modules
-require 'nibbler/data_processor'
-require 'nibbler/type_conversion'
+require 'nibbler/message'
+require 'nibbler/string_conversion'
+require 'nibbler/util'
 
 # classes
 require 'nibbler/message_builder'
 require 'nibbler/message_library'
 require 'nibbler/parser'
 require 'nibbler/session'
-
 #
 # Parse MIDI Messages
 #

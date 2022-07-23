@@ -20,10 +20,10 @@ require 'nibbler'
 nibbler = Nibbler.new
 ```
 
-Enter a MIDI message represented as string bytes
+Enter a MIDI message represented as numeric bytes
 
 ```ruby
-nibbler.parse('904064')
+nibbler.parse(0x90, 0x40, 0x64)
 
   => #<MIDIMessage::NoteOn:0x98c9818
         @channel=0,
@@ -38,13 +38,13 @@ nibbler.parse('904064')
 Enter a message byte by byte
 
 ```ruby
-nibbler.parse('90')
+nibbler.parse(0x90)
   => nil
 
-nibbler.parse('40')
+nibbler.parse(0x40)
   => nil
 
-nibbler.parse('64')
+nibbler.parse(0x64)
   => #<MIDIMessage::NoteOn:0x98c9818
        @channel=0,
        @data=[64, 100],
@@ -55,24 +55,17 @@ nibbler.parse('64')
        @verbose_name="Note On: C3">
 ```
 
-Use numeric bytes
+Enter the message as a string
 
 ```ruby
-nibbler.parse(0x90, 0x40, 0x64)
+nibbler.parse_s('904064')
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
 ```
 
-You can enter nibbles in string format
+Use string bytes
 
 ```ruby
-nibbler.parse('9', '0', '4', '0', '6', '4')
-  => #<MIDIMessage::NoteOn:0x98c9818 ...>
-```
-
-Interchange the different types
-
-```ruby
-nibbler.parse('9', '0', 0x40, 100)
+nibbler.parse_s('90', '40', '64')
   => #<MIDIMessage::NoteOn:0x98c9818 ...>
 ```
 
@@ -94,7 +87,7 @@ nibbler.messages
 Add an incomplete message
 
 ```ruby
-nibbler.parse('9')
+nibbler.parse('90')
 nibbler.parse('40')
 ```
 
@@ -102,10 +95,10 @@ See progress
 
 ```ruby
 nibbler.buffer
-  => ["9", "4", "0"]
+  => ["9", "0", "4", "0"]
 
 nibbler.buffer_s
-  => "940"
+  => "9040"
 ```
 
 Pass in a timestamp
@@ -120,7 +113,7 @@ Nibbler defaults to generate [midi-message](http://github.com/arirusso/midi-mess
 ```ruby
 Nibbler.new(message_lib: :midilib)
 
-nibbler.parse('9', '0', 0x40, '40')
+nibbler.parse(0x90, 0x40, 0x40)
   => "0: ch 00 on 40 40"
 ```
 
