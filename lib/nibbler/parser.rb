@@ -28,7 +28,7 @@ module Nibbler
     #   :rejected=>["5", "0"]
     # }
     #
-    # @param [Array<String, Integer>] nibbles
+    # @param [Array<String>] nibbles
     # @return [Hash]
     def process(nibbles)
       report = { messages: [], processed: [], rejected: [] }
