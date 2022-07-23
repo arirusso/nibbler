@@ -7,6 +7,56 @@ describe Nibbler::Parser do
   let(:parser) { Nibbler::Parser.new(library) }
   let(:fragment) { parser.send(:get_fragment_from_buffer, 0) }
 
+  describe '#process' do
+    let!(:output) { parser.process(input) }
+
+    context 'when basic' do
+      let(:input) { %w[9 0 4 0 5 0 5 0] }
+
+      it 'returns correct message' do
+        expect(output[:messages].first).to be_a(MIDIMessage::NoteOn)
+        expect(output[:processed]).to eq(%w[9 0 4 0 5 0])
+      end
+
+      it 'has trailing nibbles in buffer' do
+        expect(parser.buffer).to eq(%w[5 0])
+      end
+    end
+
+    context 'with running status' do
+      let(:input) { %w[9 0 4 0 5 0 4 0 6 0] }
+
+      it 'returns correct message' do
+        expect(output).to_not be_nil
+        expect(output[:messages][0]).to be_a(MIDIMessage::NoteOn)
+        expect(output[:messages][1]).to be_a(MIDIMessage::NoteOn)
+        expect(output[:processed]).to eq(%w[9 0 4 0 5 0 4 0 6 0])
+      end
+
+      it 'has nothing left in the buffer' do
+        expect(parser.buffer).to be_empty
+      end
+    end
+
+    context 'with multiple overlapping calls' do
+      let(:input) { %w[9 0 4 0 5 0 9 0] }
+      let(:next_input) { %w[3 0 2 0 1 0] }
+      let(:next_output) { parser.process(next_input) }
+
+      it 'returns correct messages and have trailing nibbles in buffer' do
+        expect(output).to_not be_nil
+        expect(output[:messages].first).to be_a(MIDIMessage::NoteOn)
+        expect(output[:processed]).to eq(%w[9 0 4 0 5 0])
+        expect(parser.buffer).to eq(%w[9 0])
+
+        expect(next_output).to_not be_nil
+        expect(next_output[:messages].first).to be_a(MIDIMessage::NoteOn)
+        expect(next_output[:processed]).to eq(%w[9 0 3 0 2 0])
+        expect(parser.buffer).to eq(%w[1 0])
+      end
+    end
+  end
+
   describe '#lookahead' do
     let(:output) do
       parser.send(:lookahead, fragment, Nibbler::MessageBuilder.for_channel_message(library, 0x9))
@@ -60,56 +110,6 @@ describe Nibbler::Parser do
 
       it 'returns nothing' do
         expect(output).to be_nil
-      end
-    end
-  end
-
-  describe '#process' do
-    let!(:output) { parser.process(input) }
-
-    context 'when basic' do
-      let(:input) { %w[9 0 4 0 5 0 5 0] }
-
-      it 'returns correct message' do
-        expect(output[:messages].first).to be_a(MIDIMessage::NoteOn)
-        expect(output[:processed]).to eq(%w[9 0 4 0 5 0])
-      end
-
-      it 'has trailing nibbles in buffer' do
-        expect(parser.buffer).to eq(%w[5 0])
-      end
-    end
-
-    context 'with running status' do
-      let(:input) { %w[9 0 4 0 5 0 4 0 6 0] }
-
-      it 'returns correct message' do
-        expect(output).to_not be_nil
-        expect(output[:messages][0]).to be_a(MIDIMessage::NoteOn)
-        expect(output[:messages][1]).to be_a(MIDIMessage::NoteOn)
-        expect(output[:processed]).to eq(%w[9 0 4 0 5 0 4 0 6 0])
-      end
-
-      it 'has nothing left in the buffer' do
-        expect(parser.buffer).to be_empty
-      end
-    end
-
-    context 'with multiple overlapping calls' do
-      let(:input) { %w[9 0 4 0 5 0 9 0] }
-      let(:next_input) { %w[3 0 2 0 1 0] }
-      let(:next_output) { parser.send(:process, next_input) }
-
-      it 'returns correct messages and have trailing nibbles in buffer' do
-        expect(output).to_not be_nil
-        expect(output[:messages].first).to be_a(MIDIMessage::NoteOn)
-        expect(output[:processed]).to eq(%w[9 0 4 0 5 0])
-        expect(parser.buffer).to eq(%w[9 0])
-
-        expect(next_output).to_not be_nil
-        expect(next_output[:messages].first).to be_a(MIDIMessage::NoteOn)
-        expect(next_output[:processed]).to eq(%w[9 0 3 0 2 0])
-        expect(parser.buffer).to eq(%w[1 0])
       end
     end
   end
