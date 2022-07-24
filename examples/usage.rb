@@ -51,10 +51,13 @@ pp nibbler.parse_s('40')
 pp 'See progress'
 
 pp nibbler.buffer # should give you an array of bytes
+pp nibbler.clear
+pp nibbler.buffer # should be empty array
 
 pp 'Pass in a timestamp'
 
 pp nibbler.parse_s('904040', timestamp: Time.now.to_i)
+pp nibbler.events
 
 pp 'Generate midilib messages'
 

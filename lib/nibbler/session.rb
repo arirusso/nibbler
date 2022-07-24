@@ -10,31 +10,41 @@ module Nibbler
     attr_reader :events
 
     def_delegators :@parser, :buffer
-    def_delegator :clear_buffer, :buffer, :clear
 
     Event = Struct.new(:report, :timestamp)
 
     # @param [Hash] options
-    # @option options [Symbol] :message_lib The name of a message library module eg MIDIMessage or Midilib
+    # @param [Symbol] message_lib The name of a message library module eg :midilib or :midi_message
     def initialize(message_lib: nil)
       @events = []
       library = MessageLibrary.adapter(message_lib)
       @parser = Parser.new(library)
     end
 
+    # Clear the parser buffer
+    # @return [Array<Integer>]
+    def clear
+      @parser.buffer.clear
+    end
+
+    # Parse some string input.  Can be single or multiple bytes
+    # eg single '40'
+    # eg multiple '4050'
+    # @param [Array<Integer>] bytes
+    # @param [Object] timestamp A timestamp to store with the messages that result
+    # @return [Array<Object>]
     def parse_string(*args, timestamp: Time.now.to_i)
-      integers = StringConversion.convert_strings_to_numeric_bytes(*args)
+      integers = Util::Conversion.strings_to_numeric_bytes(*args)
       parse(*integers, timestamp: timestamp)
     end
     alias parse_s parse_string
 
-    # Parse some input
-    # @param [*Object] args
-    # @param [Hash] options (can be included as the last arg)
-    # @option options [Time] :timestamp A timestamp to store with the messages that result
-    # @return [Array<Object>, Hash]
-    def parse(*args, timestamp: Time.now.to_i)
-      parser_report = @parser.process(*args)
+    # Parse the given integer bytes and add them to the buffer.
+    # @param [Array<Integer>] bytes
+    # @param [Object] timestamp A timestamp to store with the messages that result
+    # @return [Array<Object>]
+    def parse(*bytes, timestamp: Time.now.to_i)
+      parser_report = @parser.process(*bytes)
       @events << Event.new(parser_report, timestamp)
       parser_report.messages
     end

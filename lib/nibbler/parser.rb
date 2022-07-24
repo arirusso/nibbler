@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 module Nibbler
-  # Parses raw data and creates midi messages. Messages, processed data and rejected data are all logged
+  # Parses raw data and creates midi messages.
   class Parser
     Report = Struct.new(:messages, :other, :processed)
 
     attr_reader :buffer
 
+    # @param [Nibbler::Midilib, Nibbler::MidiMessage] library Thea message library module
     def initialize(library)
       @library = library
       @running_status = nil
@@ -14,24 +15,26 @@ module Nibbler
     end
 
     # Process the given bytes and add them to the buffer.
-    # Returns a Hash report about the current state of the buffer. eg
+    # Returns a report about the current state of the buffer. eg
     # with no prior input, `Parser.process(0x50, 0x90, 0x40, 0x64)` will return
-    # {
-    #   :messages=>[#<MIDIMessage::NoteOn:0x000000010cdc60b0
-    #     @status=[9, 0],
-    #     @data=[64, 100],
-    #     @channel=0,
-    #     @note=64,
-    #     @velocity=100,
-    #     @const=#<MIDIMessage::Constant::Map:0x000000010cad9780 @key="C3", @value=64>,
-    #     @name="C3",
-    #     @verbose_name="Note On: C3">],
-    #   :processed=>[0x90, 0x40, 0x64],
-    #   :rejected=>[0x50]
-    # }
+    # #<struct Nibbler::Parser::Report
+    #   messages=[
+    #     <MIDIMessage::NoteOn:0x000000010cdc60b0
+    #         @status=[9, 0],
+    #         @data=[64, 100],
+    #         @channel=0,
+    #         @note=64,
+    #         @velocity=100,
+    #         @const=#<MIDIMessage::Constant::Map:0x000000010cad9780 @key="C3", @value=64>,
+    #         @name="C3",
+    #         @verbose_name="Note On: C3">
+    #   ],
+    #   other=[64],
+    #   processed=[144, 64, 80]
+    # >
     #
-    # @param [Array<Integer>] bytes
-    # @return [Hash]
+    # @param [Array<Integer>] bytes The bytes to process
+    # @return [Report]
     def process(*bytes)
       report = Report.new([], [], [])
       pointer = 0
@@ -59,7 +62,7 @@ module Nibbler
     end
 
     def handle_running_status(pointer, report)
-      status_nibbles = Util.numeric_byte_to_numeric_nibbles(@running_status)
+      status_nibbles = Util::Conversion.numeric_byte_to_numeric_nibbles(@running_status)
       builder = message_builder_for(status_nibbles)
       if builder.can_build_next?(@buffer, running_status: @running_status)
         build_running_status_message(builder, pointer, report, status_nibble2: status_nibbles[1])
@@ -73,7 +76,7 @@ module Nibbler
     def handle_status_byte(pointer, report)
       report.other += @buffer.slice(0, pointer) # record anything unprocessed in the buffer before this message
       status_byte = @buffer[pointer]
-      status_nibbles = Util.numeric_byte_to_numeric_nibbles(status_byte)
+      status_nibbles = Util::Conversion.numeric_byte_to_numeric_nibbles(status_byte)
       builder = message_builder_for(status_nibbles)
       if builder.can_build_next?(@buffer[pointer..-1])
         set_running_status(status_nibbles, status_byte)
