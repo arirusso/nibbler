@@ -22,11 +22,9 @@ module Nibbler
       @parser = Parser.new(library)
     end
 
-    def parse_string(*args)
-      options = args.last.is_a?(Hash) ? args.pop : {}
-
+    def parse_string(*args, timestamp: Time.now.to_i)
       integers = StringConversion.convert_strings_to_numeric_bytes(*args)
-      parse(*integers)
+      parse(*integers, timestamp: timestamp)
     end
     alias parse_s parse_string
 
@@ -35,11 +33,9 @@ module Nibbler
     # @param [Hash] options (can be included as the last arg)
     # @option options [Time] :timestamp A timestamp to store with the messages that result
     # @return [Array<Object>, Hash]
-    def parse(*args)
-      options = args.last.is_a?(Hash) ? args.pop : {}
-
+    def parse(*args, timestamp: Time.now.to_i)
       parser_report = @parser.process(*args)
-      @events << Event.new(parser_report, options[:timestamp] || Time.now.to_i)
+      @events << Event.new(parser_report, timestamp)
       parser_report.messages
     end
   end

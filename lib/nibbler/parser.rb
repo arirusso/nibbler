@@ -75,7 +75,7 @@ module Nibbler
       status_byte = @buffer[pointer]
       status_nibbles = Util.numeric_byte_to_numeric_nibbles(status_byte)
       builder = message_builder_for(status_nibbles)
-      if builder.can_build_next?(@buffer[pointer..])
+      if builder.can_build_next?(@buffer[pointer..-1])
         set_running_status(status_nibbles, status_byte)
         build_message(builder, pointer, report, status_nibble2: status_nibbles[1])
         return 0

@@ -25,7 +25,7 @@ describe Nibbler::Session do
     end
 
     context 'when individual bytes' do
-      let(:input) { ['80', '40', '40'] }
+      let(:input) { %w[80 40 40] }
 
       it 'returns correct message' do
         expect(returned_messages.count).to eq(1)

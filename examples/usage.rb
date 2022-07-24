@@ -27,7 +27,7 @@ pp "There's also a method to parse a string"
 
 pp nibbler.parse_s('904040') # this should return a message
 
-pp "You can also go byte by byte with strings"
+pp 'You can also go byte by byte with strings'
 
 pp nibbler.parse_s('90')
 

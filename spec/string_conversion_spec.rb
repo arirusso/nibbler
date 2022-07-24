@@ -7,7 +7,7 @@ describe Nibbler::StringConversion do
 
   describe '#process' do
     context 'when bytes' do
-      let(:input) { ["90", "40", "50"] }
+      let(:input) { %w[90 40 50] }
 
       it 'returns correct bytes' do
         expect(output).to eq([0x90, 0x40, 0x50])
@@ -15,7 +15,7 @@ describe Nibbler::StringConversion do
     end
 
     context 'when full string' do
-      let(:input) { ["904050"] }
+      let(:input) { ['904050'] }
 
       it 'returns correct bytes' do
         expect(output).to eq([0x90, 0x40, 0x50])
