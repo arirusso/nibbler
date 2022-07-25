@@ -78,37 +78,6 @@ describe Nibbler::MessageBuilder do
           end
         end
       end
-
-      context 'when running status' do
-        let(:result) { builder.can_build_next?(bytes, running_status: 0x90) }
-
-        context 'when valid' do
-          let(:bytes) { [0x40, 0x40] }
-          let(:status_nibble) { 0x9 }
-
-          it 'returns true' do
-            expect(result).to eq(true)
-          end
-        end
-
-        context 'when incomplete' do
-          let(:bytes) { [0x40] }
-          let(:status_nibble) { 0x9 }
-
-          it 'returns false' do
-            expect(result).to eq(false)
-          end
-        end
-
-        context 'when invalid' do
-          let(:bytes) { [0x40, 0x80] }
-          let(:status_nibble) { 0x9 }
-
-          it 'returns false' do
-            expect(result).to eq(false)
-          end
-        end
-      end
     end
 
     context 'when sysex message' do

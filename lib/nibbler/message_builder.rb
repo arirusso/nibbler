@@ -54,15 +54,13 @@ module Nibbler
 
     # Can this builder build a message from the given bytes?
     # @param [Array<Integer>] bytes The bytes to build a message with
-    # @param [Integer] running_status Build the message using running status when running status is present
     # @return [Boolean]
-    def can_build_next?(bytes, running_status: nil)
+    def can_build_next?(bytes)
       if sysex?
         # check that there's a sysex end byte
         bytes.any? { |byte| byte == 0xF7 }
       else
-        bytes_to_test = running_status ? [running_status] + bytes : bytes
-        potential_data_bytes = bytes_to_test.drop(1)
+        potential_data_bytes = bytes.drop(1)
         next_status_index = potential_data_bytes.index { |byte| Util.status_byte?(byte) }
         bytes_to_test = next_status_index ? potential_data_bytes.slice(0, next_status_index) : potential_data_bytes
         length_of_data = @length_in_bytes - 1
