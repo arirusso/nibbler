@@ -3,6 +3,44 @@
 require 'helper'
 
 describe Nibbler::Util do
+  describe '.status_bit' do
+    let(:result) { Nibbler::Util.status_bit(input) }
+    context 'when byte with first bit high' do
+      let(:input) { 0x90 }
+
+      it 'returns 1' do
+        expect(result).to eq(1)
+      end
+    end
+
+    context 'when byte with first bit low' do
+      let(:input) { 0x40 }
+
+      it 'returns 0' do
+        expect(result).to eq(0)
+      end
+    end
+  end
+
+  describe '.status_byte?' do
+    let(:result) { Nibbler::Util.status_byte?(input) }
+    context 'when byte with first bit high' do
+      let(:input) { 0x90 }
+
+      it 'returns true' do
+        expect(result).to be(true)
+      end
+    end
+
+    context 'when byte with first bit low' do
+      let(:input) { 0x40 }
+
+      it 'returns false' do
+        expect(result).to be(false)
+      end
+    end
+  end
+
   describe 'Conversion' do
     describe '.strings_to_numeric_bytes' do
       let(:output) { Nibbler::Util::Conversion.send(:strings_to_numeric_bytes, *input) }

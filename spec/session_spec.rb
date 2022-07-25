@@ -146,6 +146,16 @@ describe Nibbler::Session do
       end
     end
 
+    context 'when a sysex message' do
+      let(:input) { [0xF0, 0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7, 0x50] }
+
+      it 'returns correct message' do
+        expect(returned_messages.count).to eq(1)
+        expect(returned_message).to_not be_nil
+        expect(returned_message).to be_a(MIDIMessage::SystemExclusive)
+      end
+    end
+
     context 'when a 3-byte system common message' do
       let(:input) { [0xF2, 0x50, 0x20] }
 
