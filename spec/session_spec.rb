@@ -5,6 +5,40 @@ require 'helper'
 describe Nibbler::Session do
   let!(:session) { Nibbler::Session.new }
 
+  describe '#parse_string_to_event' do
+    let(:returned_event) { session.parse_string_to_event(*input, timestamp: timestamp) }
+    let(:timestamp) { Time.now.to_i }
+    let(:input) { %w[90 40 30] }
+    let(:returned_messages) { returned_event.report.messages }
+    let(:returned_message) { returned_messages.first }
+
+    it 'returns correct message' do
+      expect(returned_messages.count).to eq(1)
+      expect(returned_message).to be_a(MIDIMessage::NoteOn)
+      expect(returned_message.channel).to eq(0)
+      expect(returned_message.note).to eq(0x40)
+      expect(returned_message.velocity).to eq(0x30)
+      expect(returned_event.timestamp).to eq(timestamp)
+    end
+  end
+
+  describe '#parse_to_event' do
+    let(:returned_event) { session.parse_to_event(*input, timestamp: timestamp) }
+    let(:timestamp) { Time.now.to_i }
+    let(:input) { [0x91, 0x30, 0x10] }
+    let(:returned_messages) { returned_event.report.messages }
+    let(:returned_message) { returned_messages.first }
+
+    it 'returns correct message' do
+      expect(returned_messages.count).to eq(1)
+      expect(returned_message).to be_a(MIDIMessage::NoteOn)
+      expect(returned_message.channel).to eq(1)
+      expect(returned_message.note).to eq(0x30)
+      expect(returned_message.velocity).to eq(0x10)
+      expect(returned_event.timestamp).to eq(timestamp)
+    end
+  end
+
   describe '#parse_string' do
     let(:returned_messages) { session.parse_s(*input) }
     let(:returned_message) { returned_messages.first }

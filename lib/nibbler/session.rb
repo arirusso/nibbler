@@ -39,14 +39,34 @@ module Nibbler
     end
     alias parse_s parse_string
 
+    # Parse some string input.  Can be single or multiple bytes. Returns an event struct
+    # eg single '40'
+    # eg multiple '4050'
+    # @param [Array<Integer>] bytes
+    # @param [Object] timestamp A timestamp to store with the messages that result
+    # @return [Event]
+    def parse_string_to_event(*args, timestamp: Time.now.to_i)
+      integers = Util::Conversion.strings_to_numeric_bytes(*args)
+      parse_to_event(*integers, timestamp: timestamp)
+    end
+
     # Parse the given integer bytes and add them to the buffer.
     # @param [Array<Integer>] bytes
     # @param [Object] timestamp A timestamp to store with the messages that result
     # @return [Array<Object>]
     def parse(*bytes, timestamp: Time.now.to_i)
+      parse_to_event(*bytes, timestamp: timestamp).report.messages
+    end
+
+    # Parse the given integer bytes, add them to the buffer and return an event struct
+    # @param [Array<Integer>] bytes
+    # @param [Object] timestamp A timestamp to store with the messages that result
+    # @return [Event]
+    def parse_to_event(*bytes, timestamp: Time.now.to_i)
       parser_report = @parser.process(*bytes)
-      @events << Event.new(parser_report, timestamp)
-      parser_report.messages
+      event = Event.new(parser_report, timestamp)
+      @events << event
+      event
     end
   end
 end
