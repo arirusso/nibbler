@@ -10,8 +10,8 @@
 require 'forwardable'
 
 # modules
-require 'nibbler/data_processor'
-require 'nibbler/type_conversion'
+require 'nibbler/message'
+require 'nibbler/util'
 
 # classes
 require 'nibbler/message_builder'
@@ -23,10 +23,12 @@ require 'nibbler/session'
 # Parse MIDI Messages
 #
 module Nibbler
-  VERSION = '0.2.4'
+  VERSION = '0.3.0'
 
   # Shortcut to a new session object
-  def self.new(*args, &block)
-    Session.new(*args, &block)
+  # @param [Symbol] message_lib The name of a message library module eg :midilib or :midi_message
+  # @return [Nibbler::Session]
+  def self.new(message_lib: nil)
+    Session.new(message_lib: message_lib)
   end
 end

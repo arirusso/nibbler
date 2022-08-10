@@ -8,64 +8,59 @@ $LOAD_PATH.unshift(File.join('..', 'lib'))
 #
 
 require 'nibbler'
-require 'pp'
 
 nibbler = Nibbler.new
 
-pp 'Enter a message piece by piece'
-
-pp nibbler.parse('90')
-
-pp nibbler.parse('40')
-
-pp nibbler.parse('40')
-
-pp 'Enter a message all at once'
-
-pp nibbler.parse('904040')
-
-pp 'Use Bytes'
+pp 'Enter a message using numeric bytes'
 
 pp nibbler.parse(0x90, 0x40, 0x40) # this should return a message
 
-pp 'Use nibbles in string format'
+pp 'Go byte by byte'
 
-pp nibbler.parse('9', '0', 0x40, 0x40) # this should return a message
+pp nibbler.parse(0x90)
 
-pp 'Interchange the different types'
+pp nibbler.parse(0x40)
 
-pp nibbler.parse('9', '0', 0x40, 64)
+pp nibbler.parse(0x40) # this should return a message
+
+pp "There's also a method to parse a string"
+
+pp nibbler.parse_s('904040') # this should return a message
+
+pp 'You can also go byte by byte with strings'
+
+pp nibbler.parse_s('90')
+
+pp nibbler.parse_s('40')
+
+pp nibbler.parse_s('40') # this should return a message
 
 pp 'Use running status'
 
-pp nibbler.parse(0x40, 64)
+pp nibbler.parse(0x40, 64) # this should return a message
 
 pp "Look at the messages we've parsed"
 
-pp nibbler.messages # this should return an array of messages
+pp nibbler.events
 
 pp 'Add an incomplete message'
 
-pp nibbler.parse('9')
-pp nibbler.parse('40')
+pp nibbler.parse_s('90')
+pp nibbler.parse_s('40')
 
 pp 'See progress'
 
-pp nibbler.buffer # should give you an array of bits
-
-pp nibbler.buffer_s # should give you an array of bytestrs
+pp nibbler.buffer # should give you an array of bytes
+pp nibbler.clear
+pp nibbler.buffer # should be empty array
 
 pp 'Pass in a timestamp'
 
-# NOTE: once you pass in a timestamp for the first time, nibbler.messages will then return
-# an array of message/timestamp hashes
-# if there was no timestamp for a particular message it will be nil
-#
-
-pp nibbler.parse('904040', timestamp: Time.now.to_i)
+pp nibbler.parse_s('904040', timestamp: Time.now.to_i)
+pp nibbler.events
 
 pp 'Generate midilib messages'
 
 midilib_nibbler = Nibbler.new(message_lib: :midilib)
 
-pp midilib_nibbler.parse('9', '0', 0x40, '40')
+pp midilib_nibbler.parse(0x90, 0x40, 0x40)

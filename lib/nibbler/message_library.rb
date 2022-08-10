@@ -4,7 +4,7 @@ module Nibbler
   # Abstraction to represent which Ruby MIDI message library is being used
   class MessageLibrary
     # MIDI message object library adapter
-    # @param [Symbol] lib The MIDI message library module eg MIDIMessage or Midilib
+    # @param [Symbol] lib The name of a message library module eg :midilib or :midi_message
     # @return [Module]
     def self.adapter(lib = nil)
       case lib
