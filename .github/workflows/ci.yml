@@ -1,0 +1,46 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    strategy:
+      matrix:
+        ruby-version:
+          - "2.4"
+          - "2.7"
+          - "3.0"
+          - "3.1"
+    name: ${{ format('Tests (Ruby {0})', matrix.ruby-version) }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+
+      - name: Run Tests
+        run: |
+          bundle exec rspec
+  lint:
+    strategy:
+      matrix:
+        ruby-version:
+          - "2.4"
+    name: ${{ format('Lint (Ruby {0})', matrix.ruby-version) }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+
+      - name: Run Linter
+        run: |
+          bundle exec rubocop
