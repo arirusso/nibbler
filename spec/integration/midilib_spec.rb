@@ -70,14 +70,12 @@ describe Nibbler::Midilib do
   end
 
   context 'when pitch bend' do
-    # to-do handle the midilib lsb/msb
-    # right now the second data byte is being thrown away
-    let(:message) { lib.pitch_bend(0x0, 0x20, 0x00) }
+    let(:message) { lib.pitch_bend(0x0, 0x10, 0x3f) }
 
     it 'returns correct message' do
       expect(message).to be_a(MIDI::PitchBend)
       expect(message.channel).to eq(0)
-      expect(message.value).to eq(0x20)
+      expect(message.value).to eq(8080)
     end
   end
 

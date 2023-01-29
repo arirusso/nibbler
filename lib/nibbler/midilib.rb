@@ -34,9 +34,7 @@ module Nibbler
     end
 
     def pitch_bend(second_nibble, data_byte1, data_byte2)
-      # to-do handle the midilib lsb/msb
-      # right now the second data byte is being thrown away
-      MIDI::PitchBend.new(second_nibble, data_byte1, data_byte2)
+      MIDI::PitchBend.new(second_nibble, data_byte2 * 128 + data_byte1)
     end
 
     def system_exclusive(*args)
