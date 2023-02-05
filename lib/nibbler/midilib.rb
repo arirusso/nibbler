@@ -41,9 +41,9 @@ module Nibbler
       MIDI::SystemExclusive.new(args)
     end
 
-    def system_common(second_nibble, data_byte1 = nil, _data_byte2 = nil)
+    def system_common(second_nibble, data_byte1 = nil, data_byte2 = nil)
       case second_nibble
-      when 0x2 then MIDI::SongPointer.new(data_byte1) # similar issue to pitch bend here
+      when 0x2 then MIDI::SongPointer.new(data_byte2 * 128 + data_byte1)
       when 0x3 then MIDI::SongSelect.new(data_byte1)
       when 0x6 then MIDI::TuneRequest.new
       end
