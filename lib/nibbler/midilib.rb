@@ -34,18 +34,16 @@ module Nibbler
     end
 
     def pitch_bend(second_nibble, data_byte1, data_byte2)
-      # to-do handle the midilib lsb/msb
-      # right now the second data byte is being thrown away
-      MIDI::PitchBend.new(second_nibble, data_byte1, data_byte2)
+      MIDI::PitchBend.new(second_nibble, data_byte2 * 128 + data_byte1)
     end
 
     def system_exclusive(*args)
       MIDI::SystemExclusive.new(args)
     end
 
-    def system_common(second_nibble, data_byte1 = nil, _data_byte2 = nil)
+    def system_common(second_nibble, data_byte1 = nil, data_byte2 = nil)
       case second_nibble
-      when 0x2 then MIDI::SongPointer.new(data_byte1) # similar issue to pitch bend here
+      when 0x2 then MIDI::SongPointer.new(data_byte2 * 128 + data_byte1)
       when 0x3 then MIDI::SongSelect.new(data_byte1)
       when 0x6 then MIDI::TuneRequest.new
       end
