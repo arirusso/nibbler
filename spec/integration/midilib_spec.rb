@@ -89,11 +89,11 @@ describe Nibbler::Midilib do
   end
 
   context 'when song pointer' do
-    let(:message) { lib.system_common(0x2, 0xF0) }
+    let(:message) { lib.system_common(0x2, 0x6d, 0x01) }
 
     it 'returns correct message' do
       expect(message).to be_a(MIDI::SongPointer)
-      expect(message.pointer).to eq(0xF0)
+      expect(message.pointer).to eq(237)
     end
   end
 
